@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WAD Project Documentation - RAPOS</title>
+    <style>
+        body {
+            font-family: 'Calibri', 'Arial', sans-serif;
+            line-height: 1.6;
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 20mm;
+            background: white;
+            color: #000;
+        }
+        h1 {
+            color: #1f3a5f;
+            text-align: center;
+            border-bottom: 3px solid #2c5fb8;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            font-size: 28pt;
+        }
+        h2 {
+            color: #1f3a5f;
+            font-size: 18pt;
+            margin-top: 40px;
+            border-bottom: 2px solid #2c5fb8;
+            padding-bottom: 10px;
+        }
+        h3 {
+            color: #2c5fb8;
+            font-size: 14pt;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .page-section {
+            page-break-after: always;
+            margin-bottom: 40px;
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .page-section:last-child {
+            page-break-after: auto;
+        }
+        .field-label {
+            font-weight: bold;
+            color: #1f3a5f;
+            margin-top: 15px;
+            font-size: 12pt;
+        }
+        .description {
+            background: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #2c5fb8;
+            margin: 10px 0;
+            line-height: 1.8;
+        }
+        pre {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-left: 4px solid #2c5fb8;
+            padding: 15px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 10pt;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .screenshot-placeholder {
+            background: #f0f0f0;
+            border: 2px dashed #999;
+            padding: 60px 20px;
+            text-align: center;
+            color: #666;
+            margin: 15px 0;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11pt;
+        }
+        .student-info {
+            background: #e8f4f8;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+        .student-info p {
+            margin: 5px 0;
+        }
+        .separator {
+            border-top: 2px dashed #ccc;
+            margin: 40px 0;
+        }
+        @media print {
+            body {
+                padding: 0;
+            }
+            .page-section {
+                page-break-after: always;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<h1>Web Application Development Project</h1>
+<h2 style="text-align: center; border: none; color: #2c5fb8;">Risk-Aware Portfolio Optimisation System (RAPOS)</h2>
+
+<div class="student-info">
+    <p><strong>Student Name:</strong> [Your Name]</p>
+    <p><strong>Enrollment Number:</strong> [Your Enrollment Number]</p>
+    <p><strong>Course:</strong> Web Application Development (WAD)</p>
+    <p><strong>Semester:</strong> [Your Semester]</p>
+    <p><strong>Submission Date:</strong> February 10, 2026</p>
+    <p><strong>Project Title:</strong> Risk-Aware Portfolio Optimisation System (RAPOS)</p>
+</div>
+
+<div class="separator"></div>
+
+<!-- PAGE 1: HOME PAGE -->
+<div class="page-section">
+    <h2>Page 1: Home Page</h2>
+    
+    <h3 class="field-label">Page Name / Page Title:</h3>
+    <p>Home Page (p1.html) - Risk-Aware Portfolio Optimisation System</p>
+    
+    <h3 class="field-label">Brief Description:</h3>
+    <div class="description">
+        <p><strong>Purpose:</strong> The home page serves as the landing page for the RAPOS website, introducing visitors to the platform's core features and value proposition.</p>
+        
+        <p><strong>Main Content and Functionality:</strong> The page includes a hero section with the main tagline, a features grid showcasing four core features (Risk-Aware Optimisation, Automated Portfolio Allocation, Real-time Analytics, and Investor Risk Profiling), statistics section displaying key metrics (10K+ investors, $2.5B assets), customer testimonials, and call-to-action buttons for signup and login. The page features smooth scrolling navigation, hover effects on cards, and a scroll-to-top button for enhanced user experience.</p>
+    </div>
+    
+    <h3 class="field-label">Source Code:</h3>
+    <p><strong>HTML (p1.html):</strong></p>
+    <pre>&lt;!-- See attached p1.html file for complete code --&gt;
+Key features implemented:
+- Responsive navigation bar with logo and menu links
+- Hero section with gradient background
+- Features grid with clickable cards linking to detail pages
+- Statistics section with animated cards
+- Testimonials from users
+- Call-to-action buttons
+- Footer with company information
+- Scroll-to-top button with smooth animation</pre>
+    
+    <h3 class="field-label">Screenshot:</h3>
+    <div class="screenshot-placeholder">
+        [Insert screenshot of Home Page here showing Hero section, Features grid, Statistics, and Testimonials]
+    </div>
+</div>
+
+<div class="separator"></div>
+
+<!-- PAGE 2: LOGIN PAGE -->
+<div class="page-section">
+    <h2>Page 2: Login Page</h2>
+    
+    <h3 class="field-label">Page Name / Page Title:</h3>
+    <p>Login Page (login.html) - User Authentication</p>
+    
+    <h3 class="field-label">Brief Description:</h3>
+    <div class="description">
+        <p><strong>Purpose:</strong> Provides secure authentication for existing users to access their investment dashboard and portfolio management features.</p>
+        
+        <p><strong>Main Content and Functionality:</strong> The login page features a centered login form with username and password fields, "Remember Me" checkbox for persistent login, and form validation using JavaScript. Demo credentials are provided (Username: investor, Password: Risk@123). Upon successful login, users are redirected to the dashboard. The page includes links to password recovery and new user registration. Client-side validation ensures proper input format before submission, and localStorage is used to implement the "Remember Me" functionality.</p>
+    </div>
+    
+    <h3 class="field-label">Source Code:</h3>
+    <pre>&lt;!-- See attached login.html file for complete code --&gt;
+Key JavaScript features:
+- Form validation for empty fields
+- Demo credential authentication
+- localStorage for remember-me functionality
+- Redirect to dashboard on successful login
+- Error message display for invalid credentials</pre>
+    
+    <h3 class="field-label">Screenshot:</h3>
+    <div class="screenshot-placeholder">
+        [Insert screenshot of Login Page showing the login form, remember-me checkbox, and navigation links]
+    </div>
+</div>
+
+<div class="separator"></div>
+
+<!-- PAGE 3: SIGNUP PAGE -->
+<div class="page-section">
+    <h2>Page 3: Sign Up / Registration Page</h2>
+    
+    <h3 class="field-label">Page Name / Page Title:</h3>
+    <p>Sign Up Page (signup.html) - New User Registration</p>
+    
+    <h3 class="field-label">Brief Description:</h3>
+    <div class="description">
+        <p><strong>Purpose:</strong> Enables new investors to create an account on the RAPOS platform by providing personal information, investment preferences, and risk tolerance.</p>
+        
+        <p><strong>Main Content and Functionality:</strong> The comprehensive registration form is divided into three sections: Personal Information (name, email, phone, date of birth), Investment Details (experience level, annual income, investment goal, risk tolerance), and Account Security (password with strength validation). Real-time validation checks include email format verification, password strength requirements (minimum 8 characters with uppercase, lowercase, number, and special character), and terms acceptance confirmation. A visual progress indicator shows password strength, and successful registration redirects to a confirmation page with user details passed via URL parameters.</p>
+    </div>
+    
+    <h3 class="field-label">Source Code:</h3>
+    <pre>&lt;!-- See attached signup.html file for complete code --&gt;
+Key validation features:
+- Email format validation using regex
+- Password strength checker (8+ chars, uppercase, lowercase, number, symbol)
+- Real-time feedback on password strength
+- Terms and conditions acceptance requirement
+- Form data passed to success page via URL parameters</pre>
+    
+    <h3 class="field-label">Screenshot:</h3>
+    <div class="screenshot-placeholder">
+        [Insert screenshot of Sign Up Page showing all form sections: Personal Info, Investment Details, and Security]
+    </div>
+</div>
+
+<div class="separator"></div>
+
+<!-- PAGE 4: SUCCESS PAGE -->
+<div class="page-section">
+    <h2>Page 4: Registration Success Page</h2>
+    
+    <h3 class="field-label">Page Name / Page Title:</h3>
+    <p>Registration Success Page (success.html) - Account Created Confirmation</p>
+    
+    <h3 class="field-label">Brief Description:</h3>
+    <div class="description">
+        <p><strong>Purpose:</strong> Confirms successful account creation and provides users with their next steps to get started with the platform.</p>
+        
+        <p><strong>Main Content and Functionality:</strong> The success page displays a confirmation message with the user's registration details (name, email, selected investment goal, and risk tolerance level) extracted from URL parameters. It includes a "Next Steps" section with six actionable items: complete profile setup, verify email, link bank account, take risk assessment, explore dashboard features, and contact support. Quick action buttons provide direct links to the dashboard and login page. JavaScript dynamically populates user information from the registration form data passed through the URL.</p>
+    </div>
+    
+    <h3 class="field-label">Source Code:</h3>
+    <pre>&lt;!-- See attached success.html file for complete code --&gt;
+Key features:
+- URL parameter parsing to display user registration data
+- Dynamic content population using JavaScript
+- Next steps checklist for user onboarding
+- Quick action buttons for dashboard access
+- Clean, congratulatory UI design</pre>
+    
+    <h3 class="field-label">Screenshot:</h3>
+    <div class="screenshot-placeholder">
+        [Insert screenshot of Success Page showing confirmation message, user details, and next steps]
+    </div>
+</div>
+
+<div class="separator"></div>
+
+<!-- PAGE 5: DASHBOARD -->
+<div class="page-section">
+    <h2>Page 5: Investor Dashboard</h2>
+    
+    <h3 class="field-label">Page Name / Page Title:</h3>
+    <p>Dashboard Page (dashboard.html) - Portfolio Management Dashboard</p>
+    
+    <h3 class="field-label">Brief Description:</h3>
+    <div class="description">
+        <p><strong>Purpose:</strong> Main interface for logged-in investors to monitor portfolio performance, view holdings, analyze risk metrics, and access portfolio management tools.</p>
+        
+        <p><strong>Main Content and Functionality:</strong> The dashboard features a personalized welcome section with user name, quick stats cards showing portfolio value ($125,430), YTD return (+12.5%), risk score (6.2/10), and days to rebalance. Two interactive Chart.js visualizations display portfolio allocation (doughnut chart) and 6-month performance trend (line chart). The holdings section lists four investments (AAPL, BND, GLD, SPY) with current values and percentage changes. A risk analysis section shows automatically calculated metrics including volatility, Sharpe ratio, and max drawdown. JavaScript calculates all metrics dynamically based on portfolio holdings data, including weighted returns and risk-adjusted performance measures.</p>
+    </div>
+    
+    <h3 class="field-label">Source Code:</h3>
+    <pre>&lt;!-- See attached dashboard.html file for complete code --&gt;
+Key features with Chart.js integration:
+- Portfolio allocation doughnut chart (Stocks/Bonds/Commodities)
+- Performance trend line chart (6-month data)
+- Real-time portfolio calculations:
+  * Total portfolio value from holdings array
+  * Weighted average return calculation
+  * Volatility and Sharpe ratio computation
+  * Risk score on 0-10 scale
+- localStorage for user session management
+- Dynamic metric updates based on holdings data
+- Logout functionality with confirmation</pre>
+    
+    <h3 class="field-label">Screenshot:</h3>
+    <div class="screenshot-placeholder">
+        [Insert screenshot of Dashboard showing welcome section, stats cards, both charts (allocation &amp; performance), holdings list, and risk analysis]
+    </div>
+</div>
+
+<div class="separator"></div>
+
+<!-- PAGE 6: FORGOT PASSWORD -->
+<div class="page-section">
+    <h2>Page 6: Forgot Password Page</h2>
+    
+    <h3 class="field-label">Page Name / Page Title:</h3>
+    <p>Forgot Password Page (forgot-password.html) - Password Recovery</p>
+    
+    <h3 class="field-label">Brief Description:</h3>
+    <div class="description">
+        <p><strong>Purpose:</strong> Allows users who have forgotten their password to initiate a password reset process through email verification.</p>
+        
+        <p><strong>Main Content and Functionality:</strong> The password recovery page provides a simple form where users enter their registered email address. JavaScript validation ensures the email format is correct before submission. Upon submitting a valid email, a success message is displayed confirming that password reset instructions have been sent. The page includes helpful instructions about checking spam folders and provides an estimated time for email arrival. A "Back to Login" link allows users to return to the login page if they remember their credentials.</p>
+    </div>
+    
+    <h3 class="field-label">Source Code:</h3>
+    <pre>&lt;!-- See attached forgot-password.html file for complete code --&gt;
+Key features:
+- Email format validation using regex
+- Success message display after form submission
+- Clear instructions for users
+- Link back to login page
+- Professional form design with validation feedback</pre>
+    
+    <h3 class="field-label">Screenshot:</h3>
+    <div class="screenshot-placeholder">
+        [Insert screenshot of Forgot Password Page showing email input form and instructions]
+    </div>
+</div>
+
+<div class="separator"></div>
+
+<!-- PAGE 7: RISK-AWARE FEATURE -->
+<div class="page-section">
+    <h2>Page 7: Risk-Aware Optimization Feature Page</h2>
+    
+    <h3 class="field-label">Page Name / Page Title:</h3>
+    <p>Risk-Aware Optimization (feature-risk-aware.html) - Feature Detail Page</p>
+    
+    <h3 class="field-label">Brief Description:</h3>
+    <div class="description">
+        <p><strong>Purpose:</strong> Provides detailed information about the Risk-Aware Optimization feature, explaining how it helps investors balance returns with risk management.</p>
+        
+        <p><strong>Main Content and Functionality:</strong> This feature page includes a hero section explaining the concept of risk-aware optimization, followed by eight key benefits cards covering data-driven analysis, risk balancing, smart recommendations, downside protection, machine learning, modern portfolio theory, Monte Carlo simulation, and real-time analytics. The page presents a 5-step implementation process (profile creation, risk assessment, optimization, recommendations, monitoring), customizable risk levels section, and detailed technology overview. Interactive hover effects on benefit cards and smooth animations enhance user engagement. A call-to-action section encourages visitors to sign up for the service.</p>
+    </div>
+    
+    <h3 class="field-label">Source Code:</h3>
+    <pre>&lt;!-- See attached feature-risk-aware.html file for complete code --&gt;
+Key sections:
+- Hero header with feature description
+- 8 benefit cards with hover animations
+- 5-step implementation workflow
+- Customizable risk levels (Conservative to Aggressive)
+- Technology stack explanation
+- Risk-reward visualization concepts
+- CTA section with signup link
+- Responsive grid layout for benefits</pre>
+    
+    <h3 class="field-label">Screenshot:</h3>
+    <div class="screenshot-placeholder">
+        [Insert screenshot of Risk-Aware Optimization page showing hero section, benefits grid, and implementation steps]
+    </div>
+</div>
+
+<div class="separator"></div>
+
+<!-- PAGE 8: PORTFOLIO ALLOCATION -->
+<div class="page-section">
+    <h2>Page 8: Portfolio Allocation Feature Page</h2>
+    
+    <h3 class="field-label">Page Name / Page Title:</h3>
+    <p>Automated Portfolio Allocation (feature-allocation.html) - Feature Detail Page</p>
+    
+    <h3 class="field-label">Brief Description:</h3>
+    <div class="description">
+        <p><strong>Purpose:</strong> Explains the automated portfolio allocation system that determines optimal asset mix based on investor goals and risk tolerance.</p>
+        
+        <p><strong>Main Content and Functionality:</strong> The page demonstrates three sample portfolio allocations (Conservative: 60% bonds/25% stocks, Balanced: 50% stocks/35% bonds, Aggressive: 75% stocks/15% commodities) using both horizontal allocation bars and interactive Chart.js doughnut charts. Each allocation strategy is explained with its target investor profile. The benefits section covers time-saving automation, goal-aligned strategies, automatic rebalancing, and educational insights. Three interactive doughnut charts visualize the different allocation strategies, allowing users to compare them side-by-side. A comparison table details the differences between manual and automated allocation approaches. The customization section explains how users can adjust allocations, exclude specific investments, and apply socially responsible filters.</p>
+    </div>
+    
+    <h3 class="field-label">Source Code:</h3>
+    <pre>&lt;!-- See attached feature-allocation.html file for complete code --&gt;
+Key features with Chart.js:
+- 3 interactive doughnut charts (Conservative, Balanced, Aggressive)
+- Color-coded allocation bars showing percentage breakdowns
+- Detailed allocation percentages for each asset class
+- Comparison of three investment strategies
+- Benefits grid with 4 key advantages
+- Customization options section
+- Responsive chart layout
+- CTA for user signup</pre>
+    
+    <h3 class="field-label">Screenshot:</h3>
+    <div class="screenshot-placeholder">
+        [Insert screenshot of Portfolio Allocation page showing allocation bars, three doughnut charts, and benefits section]
+    </div>
+</div>
+
+<div class="separator"></div>
+
+<!-- PAGE 9: REAL-TIME ANALYTICS -->
+<div class="page-section">
+    <h2>Page 9: Real-time Analytics Feature Page</h2>
+    
+    <h3 class="field-label">Page Name / Page Title:</h3>
+    <p>Real-time Analytics (feature-analytics.html) - Feature Detail Page</p>
+    
+    <h3 class="field-label">Brief Description:</h3>
+    <div class="description">
+        <p><strong>Purpose:</strong> Showcases the real-time analytics capabilities that provide investors with instant portfolio insights and market monitoring.</p>
+        
+        <p><strong>Main Content and Functionality:</strong> The page features a dashboard preview section displaying four key metrics (Portfolio Value: $125,430, Daily Change: +$1,250, Volatility: 14.2%, Sharpe Ratio: 1.85) in a grid layout. Two interactive Chart.js visualizations demonstrate analytics capabilities: a line chart showing 6-month returns (monthly data from January to June) and a bubble chart comparing risk vs return between the user's portfolio and benchmark. Benefits section highlights instant updates, smart alerts, performance tracking, and deep insights. The analytics features section covers portfolio monitoring, risk analysis, customizable alerts, detailed reports, and market intelligence. Multi-platform access information explains web, mobile, email, API, and CSV export capabilities.</p>
+    </div>
+    
+    <h3 class="field-label">Source Code:</h3>
+    <pre>&lt;!-- See attached feature-analytics.html file for complete code --&gt;
+Key features with Chart.js:
+- Dashboard metric cards preview
+- 6-month returns line chart with monthly data
+- Risk vs Return bubble chart (portfolio vs benchmark comparison)
+- 4 benefit cards (Updates, Alerts, Tracking, Insights)
+- Analytics capabilities grid
+- Multi-platform access information
+- Interactive hover effects on charts
+- Responsive design for all screen sizes</pre>
+    
+    <h3 class="field-label">Screenshot:</h3>
+    <div class="screenshot-placeholder">
+        [Insert screenshot of Real-time Analytics page showing dashboard metrics, both charts (returns &amp; risk-return), and benefits]
+    </div>
+</div>
+
+<div class="separator"></div>
+
+<!-- PAGE 10: RISK PROFILING -->
+<div class="page-section">
+    <h2>Page 10: Risk Profiling Feature Page</h2>
+    
+    <h3 class="field-label">Page Name / Page Title:</h3>
+    <p>Investor Risk Profiling (feature-risk-profiling.html) - Feature Detail Page</p>
+    
+    <h3 class="field-label">Brief Description:</h3>
+    <div class="description">
+        <p><strong>Purpose:</strong> Explains the risk profiling assessment system that categorizes investors based on their risk tolerance and recommends appropriate investment strategies.</p>
+        
+        <p><strong>Main Content and Functionality:</strong> The page presents five detailed risk profile categories (Conservative, Moderately Conservative, Balanced, Moderately Aggressive, and Aggressive) with specific characteristics including investment horizon (3-40+ years), risk tolerance levels (1-10 scale), equity allocation percentages (10-90%), and target annual returns (4-12%+). Each profile is displayed in a color-coded card with comprehensive details. The benefits section covers scientific assessment methodology, accuracy through research-backed models, personalization options, and the ability to update profiles anytime. Assessment process section explains the 15-20 minute questionnaire covering investment goals, time horizon, financial situation, risk tolerance, market knowledge, and emotional reactions. Sample questions are provided to demonstrate the assessment approach.</p>
+    </div>
+    
+    <h3 class="field-label">Source Code:</h3>
+    <pre>&lt;!-- See attached feature-risk-profiling.html file for complete code --&gt;
+Key sections:
+- 5 detailed risk profile cards with comprehensive metrics
+- Color-coded profile categorization
+- Investment horizon and equity allocation specifications
+- Expected return ranges for each profile
+- 4 key benefits of risk profiling
+- Assessment process breakdown
+- Sample questionnaire questions
+- Profile update capabilities
+- CTA for taking risk assessment</pre>
+    
+    <h3 class="field-label">Screenshot:</h3>
+    <div class="screenshot-placeholder">
+        [Insert screenshot of Risk Profiling page showing all 5 risk profiles, benefits section, and assessment details]
+    </div>
+</div>
+
+<div class="separator"></div>
+
+<!-- CSS STYLESHEET -->
+<div class="page-section">
+    <h2>Stylesheet: Main CSS File</h2>
+    
+    <h3 class="field-label">File Name:</h3>
+    <p>s1.css - Centralized Stylesheet</p>
+    
+    <h3 class="field-label">Brief Description:</h3>
+    <div class="description">
+        <p><strong>Purpose:</strong> Provides consistent styling, responsive design, and visual effects across all pages of the RAPOS website.</p>
+        
+        <p><strong>Main Content and Functionality:</strong> The stylesheet implements a comprehensive design system with a professional color scheme (navy #1f3a5f, bright blue #2c5fb8, light background #f4f6f9), responsive navigation with sticky positioning, card-based layouts with hover effects and shadows, gradient backgrounds for hero sections, smooth animations and transitions, mobile-responsive grid systems using CSS Grid and Flexbox, form styling with validation states, and button styles with multiple variants. Additional styling covers testimonial cards, statistics sections, workflow steps, benefit cards, allocation visualizations, risk profile displays, and footer layouts. Media queries ensure proper rendering across desktop, tablet, and mobile devices.</p>
+    </div>
+    
+    <h3 class="field-label">Source Code:</h3>
+    <pre>&lt;!-- See attached s1.css file for complete code --&gt;
+Key CSS features:
+- Color variables and consistent theme
+- Responsive navigation with sticky header
+- Card components with hover animations
+- Gradient backgrounds and overlays
+- Form styling with input validation states
+- Button variants (primary, secondary, outline)
+- Grid and flexbox layouts
+- Smooth transitions (0.3s ease)
+- Mobile-first responsive design
+- Media queries for tablets and phones
+- Scroll behavior: smooth
+- Box shadows and border radius for depth</pre>
+    
+    <h3 class="field-label">Key Styling Elements:</h3>
+    <div class="description">
+        <ul>
+            <li><strong>Navigation:</strong> Sticky header, flex layout, hover color changes</li>
+            <li><strong>Cards:</strong> White background, shadow effects, hover lift animation</li>
+            <li><strong>Forms:</strong> Styled inputs, validation feedback, password strength indicator</li>
+            <li><strong>Charts:</strong> Responsive containers for Chart.js visualizations</li>
+            <li><strong>Buttons:</strong> Gradient backgrounds, hover effects, multiple sizes</li>
+            <li><strong>Typography:</strong> Segoe UI font family, hierarchical sizing</li>
+            <li><strong>Colors:</strong> Professional blue palette, semantic color coding</li>
+            <li><strong>Responsive:</strong> Mobile breakpoints at 768px and 480px</li>
+        </ul>
+    </div>
+</div>
+
+<div class="separator"></div>
+
+<!-- PROJECT SUMMARY -->
+<div class="page-section">
+    <h2>Project Summary &amp; Technologies Used</h2>
+    
+    <h3 class="field-label">Project Overview:</h3>
+    <div class="description">
+        <p>The Risk-Aware Portfolio Optimisation System (RAPOS) is a comprehensive web application designed to help investors make data-driven investment decisions through automated portfolio management, risk assessment, and real-time analytics. The project demonstrates understanding of frontend web development concepts including HTML5 semantic markup, CSS3 styling and animations, JavaScript DOM manipulation and validation, responsive design principles, and data visualization using Chart.js library.</p>
+    </div>
+    
+    <h3 class="field-label">Technologies &amp; Tools:</h3>
+    <div class="description">
+        <ul>
+            <li><strong>HTML5:</strong> Semantic elements, forms, responsive structure</li>
+            <li><strong>CSS3:</strong> Flexbox, Grid, Gradients, Animations, Transitions, Media Queries</li>
+            <li><strong>JavaScript (ES6):</strong> Form validation, DOM manipulation, localStorage, URL parameters, event handling</li>
+            <li><strong>Chart.js (v4):</strong> Doughnut charts, line charts, bubble charts for data visualization</li>
+            <li><strong>Design Patterns:</strong> Card-based UI, responsive grids, sticky navigation</li>
+            <li><strong>Version Control:</strong> File-based project structure</li>
+        </ul>
+    </div>
+    
+    <h3 class="field-label">Key Features Implemented:</h3>
+    <div class="description">
+        <ul>
+            <li>User authentication system with client-side validation</li>
+            <li>Comprehensive registration with password strength checking</li>
+            <li>Interactive dashboard with real-time calculations</li>
+            <li>Data visualization with 6+ interactive charts</li>
+            <li>Portfolio analytics and risk metrics computation</li>
+            <li>Responsive design working on all device sizes</li>
+            <li>Form validation with regex patterns</li>
+            <li>LocalStorage for session management</li>
+            <li>Smooth animations and hover effects</li>
+            <li>Professional UI/UX with consistent design language</li>
+        </ul>
+    </div>
+    
+    <h3 class="field-label">Learning Outcomes:</h3>
+    <div class="description">
+        <ul>
+            <li>Understanding of HTML5 semantic structure and forms</li>
+            <li>CSS3 advanced styling, animations, and responsive design</li>
+            <li>JavaScript event handling and form validation</li>
+            <li>Data visualization using third-party libraries</li>
+            <li>Client-side data storage and retrieval</li>
+            <li>User experience design principles</li>
+            <li>Project organization and file structure</li>
+            <li>Portfolio calculation algorithms</li>
+            <li>Cross-browser compatibility considerations</li>
+            <li>Code commenting and documentation practices</li>
+        </ul>
+    </div>
+    
+    <h3 class="field-label">File Structure:</h3>
+    <pre>WAD/
+├── p1.html                      (Home Page)
+├── login.html                   (Login Page)
+├── signup.html                  (Registration Page)
+├── success.html                 (Success Confirmation)
+├── dashboard.html               (Investor Dashboard)
+├── forgot-password.html         (Password Recovery)
+├── feature-risk-aware.html      (Feature: Risk-Aware Optimization)
+├── feature-allocation.html      (Feature: Portfolio Allocation)
+├── feature-analytics.html       (Feature: Real-time Analytics)
+├── feature-risk-profiling.html  (Feature: Risk Profiling)
+└── s1.css                       (Main Stylesheet)</pre>
+    
+    <h3 class="field-label">Total Pages Created:</h3>
+    <p><strong>10 HTML Pages + 1 CSS Stylesheet</strong></p>
+    
+    <h3 class="field-label">External Libraries Used:</h3>
+    <ul>
+        <li>Chart.js v4.x (CDN): https://cdn.jsdelivr.net/npm/chart.js</li>
+    </ul>
+</div>
+
+<div class="separator"></div>
+
+<div style="text-align: center; padding: 40px; background: #e8f4f8; border-radius: 10px; margin-top: 40px;">
+    <h2 style="color: #1f3a5f; margin-top: 0;">End of Documentation</h2>
+    <p style="color: #666;">
+        This document contains complete details for all 10 web pages created for the RAPOS project.<br>
+        To use this document: Open in Microsoft Word → Save As → Choose .docx format → Add screenshots
+    </p>
+    <p style="margin-top: 20px; font-size: 12pt;">
+        <strong>Instructions for Screenshots:</strong><br>
+        1. Open each HTML file in a web browser<br>
+        2. Take full-page screenshots<br>
+        3. Replace the [Screenshot Placeholder] sections with actual images<br>
+        4. Ensure all page elements are visible in screenshots
+    </p>
+</div>
+
+</body>
+</html>

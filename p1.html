@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk-Aware Portfolio Optimisation System</title>
+    <link rel="stylesheet" href="s1.css">
+    <style>
+        /* Specific Landing Page Styles not in global */
+        .features-section {
+            background-color: var(--bg-primary);
+        }
+
+        .stats-section {
+            background: var(--bg-secondary);
+            border-top: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            text-align: center;
+        }
+
+        .stat-item h3 {
+            font-size: 48px;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .stat-item p {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .workflow-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .workflow-step {
+            background: var(--bg-secondary);
+            padding: 40px 30px;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-number {
+            width: 48px;
+            height: 48px;
+            background: var(--accent-primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0 auto 20px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .workflow-step h3 {
+            margin-bottom: 12px;
+            font-size: 20px;
+        }
+
+        .cta-section {
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            padding: 100px 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .cta-section h2 {
+            color: white;
+            font-size: 40px;
+            margin-bottom: 20px;
+        }
+
+        .cta-section p {
+            color: #94a3b8;
+            font-size: 18px;
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav id="navbar">
+        <div class="logo">RAPOS</div>
+        <ul>
+            <li><a href="p1.html" class="active">Home</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#workflow">How it Works</a></li>
+            <li><a href="login.html" class="btn btn-secondary" style="padding: 8px 16px;">Log in</a></li>
+            <li><a href="signup.html" class="btn btn-primary" style="padding: 8px 16px; color: white;">Sign up</a></li>
+        </ul>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero reveal">
+        <div class="hero-content">
+            <h1>Smarter Investments with <br>Risk-Aware Intelligence</h1>
+            <p>Optimize your portfolio using quantitative risk models, Deep Learning LSTM price predictions, and smart
+                allocation strategies.</p>
+            <div style="display: flex; gap: 16px; justify-content: center; margin-top: 30px;">
+                <a href="signup.html" class="btn btn-primary">Get Started for Free</a>
+                <a href="#features" class="btn btn-secondary">Explore Features</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATISTICS -->
+    <section class="section stats-section reveal">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <h3>10K+</h3>
+                <p>Active Investors</p>
+            </div>
+            <div class="stat-item">
+                <h3>$2.5B</h3>
+                <p>Assets Optimized</p>
+            </div>
+            <div class="stat-item">
+                <h3>98%</h3>
+                <p>Model Accuracy</p>
+            </div>
+            <div class="stat-item">
+                <h3>24/7</h3>
+                <p>AI Monitoring</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="section features-section" id="features">
+        <div class="section-header reveal">
+            <h2>Core Capabilities</h2>
+            <p>Discover how RAPOS brings institutional-grade analytics to your personal portfolio.</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="card reveal" style="transition-delay: 0.1s;">
+                <div style="font-size: 32px; margin-bottom: 20px;"></div>
+                <h3 style="margin-bottom: 12px; font-size: 20px;">Risk-Aware Optimization</h3>
+                <p style="margin-bottom: 20px;">Intelligent portfolio management that understands and respects your risk tolerance while maximizing returns.</p>
+                <a href="feature-risk-aware.html"
+                    style="color: var(--accent-primary); font-weight: 500; text-decoration: none;">Learn more →</a>
+            </div>
+
+            <div class="card reveal" style="transition-delay: 0.2s;">
+                <div style="font-size: 32px; margin-bottom: 20px;"></div>
+                <h3 style="margin-bottom: 12px; font-size: 20px;">Automated Portfolio Allocation</h3>
+                <p style="margin-bottom: 20px;">Dynamically adjust your portfolio weights based on real-time volatility tracking and Sharpe ratio optimization.</p>
+                <a href="feature-allocation.html" style="color: var(--accent-primary); font-weight: 500; text-decoration: none;">Learn more →</a>
+            </div>
+
+            <div class="card reveal" style="transition-delay: 0.3s;">
+                <div style="font-size: 32px; margin-bottom: 20px;"></div>
+                <h3 style="margin-bottom: 12px; font-size: 20px;">Real-time Analytics</h3>
+                <p style="margin-bottom: 20px;">Monitor your entire portfolio via a sleek, interactive dashboard powered by live backend API connections.</p>
+                <a href="feature-analytics.html" style="color: var(--accent-primary); font-weight: 500; text-decoration: none;">Learn more →</a>
+            </div>
+
+            <div class="card reveal" style="transition-delay: 0.4s;">
+                <div style="font-size: 32px; margin-bottom: 20px;"></div>
+                <h3 style="margin-bottom: 12px; font-size: 20px;">Investor Risk Profiling</h3>
+                <p style="margin-bottom: 20px;">Establish your unique baseline risk tolerance through our comprehensive assessment engine.</p>
+                <a href="feature-risk-profiling.html" style="color: var(--accent-primary); font-weight: 500; text-decoration: none;">Learn more →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- WORKFLOW -->
+    <section class="section" id="workflow">
+        <div class="section-header reveal">
+            <h2>How It Works</h2>
+            <p>Four simple steps to a highly optimized, automated investment strategy.</p>
+        </div>
+
+        <div class="workflow-grid">
+            <div class="workflow-step reveal" style="transition-delay: 0.1s;">
+                <div class="step-number">1</div>
+                <h3>Connect Data</h3>
+                <p>Link your accounts or upload custom CSV datasets to feed the system.</p>
+            </div>
+
+            <div class="workflow-step reveal" style="transition-delay: 0.2s;">
+                <div class="step-number">2</div>
+                <h3>Risk Profiling</h3>
+                <p>Answer a few questions to establish your unique baseline risk tolerance.</p>
+            </div>
+
+            <div class="workflow-step reveal" style="transition-delay: 0.3s;">
+                <div class="step-number">3</div>
+                <h3>AI Processing</h3>
+                <p>Our backend runs continuous LSTM predictions to hunt for market anomalies.</p>
+            </div>
+
+            <div class="workflow-step reveal" style="transition-delay: 0.4s;">
+                <div class="step-number">4</div>
+                <h3>Auto-Rebalance</h3>
+                <p>Receive one-click rebalancing alerts when your portfolio drifts from target.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CALL TO ACTION -->
+    <section class="cta-section reveal">
+        <h2>Ready to Optimize Your Portfolio?</h2>
+        <p>Join thousands of intelligent investors using RAPOS to outsmart the market.</p>
+        <div style="display: flex; gap: 16px; justify-content: center;">
+            <a href="signup.html" class="btn btn-primary" style="padding: 14px 32px; font-size: 16px;">Create Free
+                Account</a>
+            <a href="login.html" class="btn btn-secondary"
+                style="padding: 14px 32px; font-size: 16px; background: rgba(255,255,255,0.1); color: white; border-color: rgba(255,255,255,0.2);">Sign
+                In</a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-section">
+                <div class="logo" style="font-size: 20px; margin-bottom: 16px;">RAPOS</div>
+                <p style="font-size: 14px;">Risk-Aware Portfolio Optimization System providing intelligent, automated
+                    investment solutions.</p>
+            </div>
+
+            <div class="footer-section">
+                <h4>Platform</h4>
+                <ul>
+                    <li><a href="dashboard.html">Investor Dashboard</a></li>
+                    <li><a href="#">Deep Learning API</a></li>
+                    <li><a href="#">Security</a></li>
+                    <li><a href="#">Pricing</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div
+            style="border-top: 1px solid #e2e8f0; margin-top: 40px; padding-top: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+            <p style="font-size: 14px; margin: 0;">© 2026 RAPOS. All rights reserved.</p>
+            <div style="display: flex; gap: 20px;">
+                <a href="#" style="color: var(--text-secondary); text-decoration: none; font-size: 14px;">Privacy
+                    Policy</a>
+                <a href="#" style="color: var(--text-secondary); text-decoration: none; font-size: 14px;">Terms of
+                    Service</a>
+            </div>
+        </div>
+    </footer>
+
+    <button id="scrollToTop" title="Go to top">↑</button>
+
+    <script src="responsive.js"></script>
+    <script>
+        // Reveal Animations using Intersection Observer
+        document.addEventListener("DOMContentLoaded", function () {
+            const reveals = document.querySelectorAll(".reveal");
+
+            const revealOptions = {
+                threshold: 0.15,
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            const revealOnScroll = new IntersectionObserver(function (entries, observer) {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) {
+                        return;
+                    } else {
+                        entry.target.classList.add("active");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, revealOptions);
+
+            reveals.forEach(reveal => {
+                revealOnScroll.observe(reveal);
+            });
+
+            // Navbar Scroll Effect
+            const navbar = document.getElementById("navbar");
+            window.addEventListener("scroll", () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add("nav-scrolled");
+                } else {
+                    navbar.classList.remove("nav-scrolled");
+                }
+
+                // Scroll to Top button visibility
+                const scrollToTopBtn = document.getElementById("scrollToTop");
+                if (window.scrollY > 300) {
+                    scrollToTopBtn.classList.add("visible");
+                } else {
+                    scrollToTopBtn.classList.remove("visible");
+                }
+            });
+
+            // Scroll to Top action
+            document.getElementById("scrollToTop").addEventListener("click", () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

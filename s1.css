@@ -1,0 +1,564 @@
+/* 1. Google Fonts Import (Inter) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* 2. Global CSS Variables for Theming */
+:root {
+    --bg-primary: #f8fafc;
+    --bg-secondary: #ffffff;
+    
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    
+    /* Vibrant Premium Accents */
+    --accent-primary: #2563eb;
+    --accent-hover: #1d4ed8;
+    --accent-gradient: linear-gradient(135deg, #2563eb, #0ea5e9);
+    
+    --danger: #ef4444;
+    --success: #10b981;
+    
+    /* Glassmorphism settings */
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: 1px solid rgba(255, 255, 255, 0.3);
+    --glass-blur: blur(16px);
+    
+    /* Soft Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Base Resets */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-primary); 
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1; 
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8; 
+}
+
+/* 3. Typography */
+h1, h2, h3, h4, h5 {
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text-primary);
+}
+
+p {
+    color: var(--text-secondary);
+}
+
+/* 4. Navigation (Glassmorphic) */
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 5%;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-bottom: var(--glass-border);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.nav-scrolled {
+    box-shadow: var(--shadow-sm);
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: 800;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+nav a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 15px;
+    transition: color 0.2s ease;
+    position: relative;
+}
+
+nav a:hover, nav a.active {
+    color: var(--text-primary);
+}
+
+/* Nav Link Underline animation */
+nav a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -4px;
+    left: 0;
+    background: var(--accent-primary);
+    transition: width 0.3s ease;
+}
+
+nav a:hover::after, nav a.active::after {
+    width: 100%;
+}
+
+/* 5. Hero Section */
+.hero {
+    position: relative;
+    padding: 120px 20px 100px;
+    text-align: center;
+    background: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.7)), url('WhatsApp Image 2026-02-24 at 11.35.47 AM.jpeg') no-repeat center center;
+    background-size: cover;
+    background-attachment: fixed;
+    overflow: hidden;
+}
+
+/* Decorative Background blobs */
+.hero::before, .hero::after {
+    display: none; /* Hide blobs when using image background */
+}
+
+.hero-content {
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 10;
+}
+
+.hero h1 {
+    font-size: 56px;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    margin-bottom: 24px;
+    color: white;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.hero p {
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.9);
+    max-width: 600px;
+    margin: 0 auto 40px;
+    text-shadow: 0 1px 5px rgba(0,0,0,0.5);
+}
+
+/* 5.5. Feature Hero Section */
+.feature-hero {
+    position: relative;
+    padding: 160px 20px 80px;
+    text-align: center;
+    background: radial-gradient(circle at top, #e0f2fe 0%, var(--bg-primary) 100%);
+    overflow: hidden;
+}
+
+.feature-hero-content {
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 10;
+}
+
+.feature-hero h1 {
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    margin-bottom: 24px;
+    color: var(--text-primary);
+}
+
+.feature-hero p {
+    font-size: 20px;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto 40px;
+}
+
+/* 6. Buttons */
+.btn {
+    display: inline-block;
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    border: none;
+    text-align: center;
+}
+
+.btn-primary {
+    background: var(--accent-gradient);
+    color: white;
+    box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.39);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.23);
+}
+
+.btn-secondary {
+    background: white;
+    color: var(--text-primary);
+    border: 1px solid #e2e8f0;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+    transform: translateY(-2px);
+}
+
+.btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* 6.5 Modal System */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+.modal {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    border: var(--glass-border);
+    border-radius: 20px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: var(--shadow-xl);
+    transform: scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-overlay.active .modal {
+    transform: scale(1);
+}
+
+.modal-header {
+    padding: 24px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: color 0.2s;
+}
+
+.modal-close:hover {
+    color: var(--danger);
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.modal-footer {
+    padding: 20px 24px;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+/* 7. General Sections & Cards */
+.section {
+    padding: 80px 5%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.section-header h2 {
+    font-size: 36px;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.card {
+    background: var(--bg-secondary);
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-xl);
+    border-color: #cbd5e1;
+}
+
+/* Glow effect on cards */
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--accent-gradient);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.card:hover::before {
+    opacity: 1;
+}
+
+/* 8. Animations (Scroll Reveal) */
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 9. Forms & Inputs */
+.form-section {
+    background: var(--bg-secondary);
+    padding: 48px;
+    max-width: 500px;
+    margin: 60px auto;
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid #e2e8f0;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select,
+textarea {
+    width: 100%;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* 10. Dashboard specific styles */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.metric-card {
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid #e2e8f0;
+    box-shadow: var(--shadow-sm);
+}
+
+.metric-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.metric-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* 11. Footer */
+footer {
+    background: white;
+    border-top: 1px solid #e2e8f0;
+    padding: 60px 5% 30px;
+    margin-top: 80px;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.footer-section h4 {
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+.footer-section ul {
+    list-style: none;
+}
+
+.footer-section li {
+    margin-bottom: 12px;
+}
+
+.footer-section a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.footer-section a:hover {
+    color: var(--accent-primary);
+}
+
+/* Scroll To Top */
+#scrollToTop {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: var(--accent-primary);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 48px; height: 48px;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+#scrollToTop.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+#scrollToTop:hover {
+    background: var(--accent-hover);
+    transform: translateY(-3px);
+}
+
+/* 12. Mobile Responsiveness */
+@media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    .hero h1 { font-size: 40px; }
+    .hero p { font-size: 18px; }
+    .hero { padding: 80px 20px 60px; }
+    
+    nav ul {
+        display: none; /* Add hamburger menu logic later if needed */
+    }
+    
+    .section { padding: 50px 20px; }
+    
+    .form-section {
+        padding: 30px 20px;
+        margin: 30px auto;
+    }
+}

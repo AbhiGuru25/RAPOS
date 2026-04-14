@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAPOS Project Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #60a5fa;
+            --accent: #06b6d4;
+            --bg-dark: #0f172a;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,20%,1) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(225,39%,30%,1) 0, transparent 50%);
+        }
+
+        .presentation-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            transition: transform 0.8s cubic-bezier(0.85, 0, 0.15, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 100px;
+            text-align: center;
+            position: relative;
+        }
+
+        h1 { font-family: 'Outfit', sans-serif; font-size: 80px; margin-bottom: 20px; line-height: 1.1; }
+        h2 { font-family: 'Outfit', sans-serif; font-size: 48px; margin-bottom: 30px; color: var(--primary-light); }
+        p { font-size: 24px; line-height: 1.6; color: var(--text-muted); max-width: 900px; margin: 0 auto; }
+
+        .slide-content {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            padding: 60px;
+            border-radius: 40px;
+            width: 90%;
+            max-width: 1200px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .highlight {
+            background: linear-gradient(to right, var(--primary-light), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        .bullet-list {
+            text-align: left;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .bullet-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            font-size: 22px;
+            color: var(--text-main);
+        }
+        .bullet-item span {
+            color: var(--accent);
+            font-size: 28px;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 350px;
+            margin-top: 20px;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+        .btn {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .btn:hover { background: var(--border); transform: translateY(-2px); }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            background: var(--primary);
+            transition: width 0.5s;
+            z-index: 1001;
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .tech-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            padding: 25px;
+            border-radius: 20px;
+            transition: 0.3s;
+        }
+        .tech-card:hover { transform: translateY(-10px); background: rgba(255,255,255,0.06); }
+        .tech-card h3 { color: var(--accent); margin-bottom: 10px; }
+
+        canvas { width: 100% !important; height: 100% !important; }
+    </style>
+</head>
+<body>
+
+    <div class="progress-bar" id="progress"></div>
+
+    <div class="presentation-container" id="container">
+        
+        <!-- SLIDE 1: TITLE -->
+        <section class="slide">
+            <div class="slide-content">
+                <h1 class="highlight">RAPOS</h1>
+                <h2>Risk-Aware Portfolio <br> Optimisation System</h2>
+                <p>Modern AI-Driven Interface for Professional Wealth Management</p>
+                <div style="margin-top: 40px; color: var(--text-muted); font-size: 18px;">
+                    Presented by: Student Name <br>
+                    Subject: Web Application Development (WAD)
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: PROJECT OVERVIEW -->
+        <section class="slide">
+            <div class="slide-content">
+                <h2>Project Overview</h2>
+                <div style="display: flex; gap: 40px; align-items: center;">
+                    <div style="flex: 1; text-align: left;">
+                        <p style="text-align: left; margin-bottom: 20px;">
+                            RAPOS is a <span class="highlight">next-generation financial hub</span> that moves beyond simple return tracking.
+                        </p>
+                        <div class="bullet-item"><span>✓</span> Institutional-grade Risk Analysis</div>
+                        <div class="bullet-item"><span>✓</span> AI-Powered Asset Allocation</div>
+                        <div class="bullet-item"><span>✓</span> Real-time Performance Metrics</div>
+                    </div>
+                    <div style="flex: 1;">
+                        <div class="chart-container">
+                            <canvas id="overviewChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: TECH STACK -->
+        <section class="slide">
+            <div class="slide-content">
+                <h2>The Tech Stack</h2>
+                <div class="tech-grid">
+                    <div class="tech-card">
+                        <h3>HTML5</h3>
+                        <p style="font-size: 16px;">Semantic structure & Accessibility</p>
+                    </div>
+                    <div class="tech-card">
+                        <h3>CSS3</h3>
+                        <p style="font-size: 16px;">Glassmorphism, Gradients & HSL tokens</p>
+                    </div>
+                    <div class="tech-card">
+                        <h3>JavaScript</h3>
+                        <p style="font-size: 16px;">Intersection Observer & Chart.js</p>
+                    </div>
+                    <div class="tech-card">
+                        <h3>AI / Backend</h3>
+                        <p style="font-size: 16px;">PyTorch (LSTM) & FastAPI Hub</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: WEBSITE STRUCTURE -->
+        <section class="slide">
+            <div class="slide-content">
+                <h2>Modular Architecture</h2>
+                <div class="bullet-list">
+                    <div class="bullet-item"><span>🏠</span> <strong>Landing Page:</strong> High-impact entry point with scroll animations.</div>
+                    <div class="bullet-item"><span>💎</span> <strong>Feature Hub:</strong> Deep-dives into Risk & Analytics logic.</div>
+                    <div class="bullet-item"><span>🛂</span> <strong>Auth Suite:</strong> Professional Login & Signup with validation.</div>
+                    <div class="bullet-item"><span>📈</span> <strong>Investor Dashboard:</strong> Central command for live metrics.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: FRONTEND PAGES -->
+        <section class="slide">
+            <div class="slide-content">
+                <h2>Page Showcase</h2>
+                <p>Every page is designed with a <span class="highlight">Glassmorphic HUD</span> aesthetic to emphasize data clarity.</p>
+                <div style="display: flex; justify-content: center; gap: 20px; margin-top: 30px;">
+                    <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; flex: 1;">
+                        <span style="font-size: 40px;">📱</span>
+                        <h4>Responsive Layout</h4>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; flex: 1;">
+                        <span style="font-size: 40px;">🌑</span>
+                        <h4>OLED Dark Mode</h4>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; flex: 1;">
+                        <span style="font-size: 40px;">⚡</span>
+                        <h4>JS Animations</h4>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: UI DESIGN PRINCIPLES -->
+        <section class="slide">
+            <div class="slide-content">
+                <h2>UI Design Philosophy</h2>
+                <div class="bullet-list" style="grid-template-columns: 1fr;">
+                    <div class="bullet-item"><span>🎨</span> <strong>Visual Harmony:</strong> Using <code>backdrop-filter: blur()</code> for depth.</div>
+                    <div class="bullet-item"><span>⌨️</span> <strong>Typography:</strong> 'Inter' Variable font for readability.</div>
+                    <div class="bullet-item"><span>🌌</span> <strong>Z-Layering:</strong> Floating components over dynamic gradients.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 7: LIVE GRAPH DEMO -->
+        <section class="slide">
+            <div class="slide-content">
+                <h2>Predictive Risk Analytics</h2>
+                <div style="margin-bottom: 20px;">
+                    <span class="highlight">LSTM neural network</span> results visualized for the user.
+                </div>
+                <div class="chart-container">
+                    <canvas id="riskChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 8: CONCLUSION -->
+        <section class="slide">
+            <div class="slide-content">
+                <h1 class="highlight">Conclusion</h1>
+                <p style="margin-bottom: 30px;">RAPOS demonstrates that financial tools can be both <span class="highlight">technically powerful</span> and <span class="highlight">visually stunning</span>.</p>
+                <div class="bullet-list">
+                    <div class="bullet-item"><span>🚀</span> Fully Responsive Code</div>
+                    <div class="bullet-item"><span>🤖</span> Working AI Integration</div>
+                    <div class="bullet-item"><span>🔐</span> Secure UI Navigation</div>
+                    <div class="bullet-item"><span>📊</span> Dynamic Data Visuals</div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <div class="controls">
+        <button class="btn" onclick="prevSlide()">← Prev</button>
+        <button class="btn" onclick="nextSlide()">Next →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const container = document.getElementById('container');
+        const progress = document.getElementById('progress');
+
+        function updateSlide() {
+            container.style.transform = `translateX(-${currentSlide * 100}%)`;
+            progress.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+        }
+
+        function nextSlide() {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        // Initialize Charts
+        window.onload = () => {
+            updateSlide();
+
+            // Overview Chart
+            new Chart(document.getElementById('overviewChart'), {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Market Risk',
+                        data: [65, 59, 80, 81, 56, 55],
+                        borderColor: '#06b6d4',
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: 'rgba(6, 182, 212, 0.1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { display: false }, x: { grid: { display: false } } }
+                }
+            });
+
+            // Demo Risk Chart
+            new Chart(document.getElementById('riskChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Conservative', 'Balanced', 'Aggressive', 'RAPOS AI'],
+                    datasets: [{
+                        label: 'Risk/Return Ratio',
+                        data: [12, 19, 30, 8],
+                        backgroundColor: ['#3b82f6', '#8b5cf6', '#ef4444', '#10b981'],
+                        borderRadius: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } }
+                }
+            });
+        };
+    </script>
+</body>
+</html>

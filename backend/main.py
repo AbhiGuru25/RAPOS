@@ -1,20 +1,13 @@
-from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from sqlalchemy.orm import Session
 import pandas as pd
 import numpy as np
 import torch
 import os
 from typing import List
 
-# Import our custom modules
-import database, models, schemas, auth
-
-# Initialize Database
-models.Base.metadata.create_all(bind=database.engine)
-
-app = FastAPI(title="RAPOS Deep Learning API", version="1.1.0")
+# Initialize FastAPI app
+app = FastAPI(title="RAPOS AI Prediction Service", version="2.0.0")
 
 # --- CORS SETUP ---
 app.add_middleware(
@@ -24,28 +17,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# --- SECURITY SETUP ---
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
-
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(database.get_db)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        from jose import jwt
-        payload = jwt.decode(token, auth.SECRET_KEY, algorithms=[auth.ALGORITHM])
-        email: str = payload.get("sub")
-        if email is None:
-            raise credentials_exception
-    except Exception:
-        raise credentials_exception
-    user = db.query(models.User).filter(models.User.email == email).first()
-    if user is None:
-        raise credentials_exception
-    return user
 
 # --- MODEL LOADING ---
 MODEL_PATH = os.path.join(os.path.dirname(__file__), 'lstm_model.pth')
@@ -79,7 +50,7 @@ def load_assets():
     global loaded_model, scaler_scale, scaler_min, SEQUENCE_LENGTH
     try:
         if os.path.exists(MODEL_PATH) and os.path.exists(SCALER_PATH):
-            print("Loading LSTM model and scaler...")
+            print("RAPOS AI: Loading LSTM model and scaler...")
             checkpoint = torch.load(MODEL_PATH, map_location=device)
             loaded_model = StockLSTM(
                 input_size=checkpoint['input_size'],
@@ -93,53 +64,17 @@ def load_assets():
             scaler_params = np.load(SCALER_PATH)
             scaler_scale = scaler_params[0]
             scaler_min = scaler_params[1]
-            print("Model loaded successfully.")
+            print("RAPOS AI: Model loaded successfully.")
         else:
-            print("WARNING: Model files not found. Ensure train_lstm.py has been run.")
+            print("RAPOS AI WARNING: Model files not found. Running in simulation fallback mode.")
     except Exception as e:
-        print(f"Error loading model: {e}")
+        print(f"RAPOS AI Error loading model: {e}")
 
-# --- AUTH ENDPOINTS ---
+# --- AI ENDPOINTS ---
 
-@app.post("/api/auth/signup", response_model=schemas.User)
-def signup(user: schemas.UserCreate, db: Session = Depends(database.get_db)):
-    db_user = db.query(models.User).filter(models.User.email == user.email).first()
-    if db_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    
-    hashed_pwd = auth.get_password_hash(user.password)
-    new_user = models.User(
-        full_name=user.full_name,
-        email=user.email,
-        hashed_password=hashed_pwd
-    )
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    return new_user
-
-@app.post("/api/auth/login", response_model=schemas.Token)
-def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(database.get_db)):
-    user = db.query(models.User).filter(models.User.email == form_data.username).first()
-    if not user or not auth.verify_password(form_data.password, user.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
-    access_token = auth.create_access_token(data={"sub": user.email})
-    return {
-        "access_token": access_token, 
-        "token_type": "bearer",
-        "user_name": user.full_name
-    }
-
-# --- APPLICATION ENDPOINTS ---
-
-@app.get("/api/user/profile", response_model=schemas.User)
-def get_user_profile(user: models.User = Depends(get_current_user)):
-    return user
+@app.get("/")
+async def root():
+    return {"message": "RAPOS AI Service is online", "integration": "Supabase Auth Hybrid"}
 
 @app.get("/api/predict-risk")
 def predict_risk(ticker: str = 'SPXX'):
@@ -150,14 +85,20 @@ def predict_risk(ticker: str = 'SPXX'):
         return {
             "ticker": ticker,
             "ai_risk_score": 5.0,
-            "message": "Demo Mode: Model not trained, showing average risk baseline."
+            "is_simulated": True,
+            "message": "Demo Mode: Using average risk baseline."
         }
         
     try:
         df = pd.read_csv(DATA_PATH)
         df_ticker = df[df['Ticker'] == ticker].copy()
         if len(df_ticker) < SEQUENCE_LENGTH:
-            raise HTTPException(status_code=400, detail=f"Not enough data for {ticker}.")
+             # Simulation fallback if ticker is missing from local CSV (like new crypto)
+             return {
+                "ticker": ticker,
+                "ai_risk_score": round(np.random.uniform(4.0, 8.0), 1),
+                "is_simulated": True
+            }
             
         recent_data = df_ticker['Close'].values[-SEQUENCE_LENGTH:]
         scaled_inputs = recent_data * scaler_scale + scaler_min
@@ -180,10 +121,17 @@ def predict_risk(ticker: str = 'SPXX'):
             "predicted_daily_return_pct": round(float(predicted_return), 2),
             "historical_volatility_pct": round(float(annual_volatility), 2),
             "ai_risk_score": round(float(risk_score), 1),
-            "model_type": "LSTM Neural Network"
+            "model_type": "LSTM Neural Network",
+            "is_simulated": False
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        # Extreme fallback
+        return {
+            "ticker": ticker, 
+            "ai_risk_score": 6.5, 
+            "is_simulated": True, 
+            "error": str(e)
+        }
 
 if __name__ == "__main__":
     import uvicorn

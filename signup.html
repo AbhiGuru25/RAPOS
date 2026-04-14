@@ -173,7 +173,7 @@
 <div class="bg-blob blob-2"></div>
 
 <div class="auth-container">
-    <a href="p1.html" class="auth-logo">RAPOS</a>
+    <a href="index.html" class="auth-logo">RAPOS</a>
     
     <div class="auth-header">
         <h1>Create an Account</h1>
@@ -226,11 +226,16 @@
     </div>
 </div>
 
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+
 <script>
     async function handleSignup() {
         const full_name = document.getElementById('firstName').value + " " + document.getElementById('lastName').value;
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
+        const investment_exp = document.getElementById('experience').value;
         
         const btn = document.getElementById('signupBtn');
         const msg = document.getElementById('errorMsg');
@@ -241,32 +246,37 @@
         msg.style.display = 'none';
 
         try {
-            const response = await fetch('http://localhost:8000/api/auth/signup', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ full_name, email, password })
+            // Register user with Supabase Auth
+            const { data, error } = await supabase.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: {
+                        full_name: full_name,
+                        investment_exp: investment_exp
+                    }
+                }
             });
 
-            if (response.ok) {
-                btn.style.background = '#10b981';
-                btn.textContent = 'Account Created!';
-                msg.textContent = 'Account created successfully! Redirecting to login...';
-                msg.style.display = 'block';
-                msg.style.background = '#dcfce7';
-                msg.style.color = '#166534';
-                
-                setTimeout(() => {
-                    window.location.href = 'login.html';
-                }, 1500);
-            } else {
-                const data = await response.json();
-                throw new Error(data.detail || 'Signup failed');
-            }
+            if (error) throw error;
+
+            // Success feedback
+            btn.style.background = '#10b981';
+            btn.textContent = 'Account Created!';
+            msg.textContent = 'Success! Please check your email for a confirmation link (if enabled) or sign in now.';
+            msg.style.display = 'block';
+            msg.style.background = '#dcfce7';
+            msg.style.color = '#166534';
+            
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 2500);
+
         } catch (error) {
             btn.textContent = 'Create Account';
             btn.disabled = false;
             btn.style.opacity = '1';
-            msg.textContent = error.message;
+            msg.textContent = "Error: " + error.message;
             msg.style.display = 'block';
             msg.style.background = '#fee2e2';
             msg.style.color = '#991b1b';

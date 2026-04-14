@@ -179,7 +179,7 @@
 <div class="bg-blob blob-2"></div>
 
 <div class="auth-container">
-    <a href="p1.html" class="auth-logo">RAPOS</a>
+    <a href="index.html" class="auth-logo">RAPOS</a>
     
     <div class="auth-header">
         <h1>Welcome Back</h1>
@@ -214,6 +214,10 @@
     </div>
 </div>
 
+<!-- Supabase SDK stack -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+
 <script>
     async function handleLogin() {
         const email = document.getElementById('email').value;
@@ -226,39 +230,29 @@
         btn.style.opacity = '0.7';
         err.style.display = 'none';
         
-        // Prepare form data for OAuth2
-        const formData = new FormData();
-        formData.append('username', email); // FastAPI OAuth2 expects 'username'
-        formData.append('password', password);
-
         try {
-            const response = await fetch('http://localhost:8000/api/auth/login', {
-                method: 'POST',
-                body: formData
+            // Sign in with Supabase Auth
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password,
             });
 
-            if (response.ok) {
-                const data = await response.json();
-                
-                // Store authentication details
-                localStorage.setItem("authToken", data.access_token);
-                localStorage.setItem("userName", data.user_name);
-                
+            if (error) throw error;
+
+            if (data.user) {
                 btn.style.background = '#10b981';
                 btn.textContent = 'Success! Redirecting...';
                 
+                // Supabase handles session persistence automatically.
                 setTimeout(() => {
                     window.location.href = 'dashboard.html';
                 }, 800);
-            } else {
-                const data = await response.json();
-                throw new Error(data.detail || 'Access denied. Please check your credentials.');
             }
         } catch (error) {
             btn.textContent = 'Sign In';
             btn.disabled = false;
             btn.style.opacity = '1';
-            err.textContent = error.message;
+            err.textContent = "Error: " + error.message;
             err.style.display = 'block';
         }
     }

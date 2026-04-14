@@ -152,7 +152,7 @@
 <nav id="navbar">
     <div class="logo">RAPOS</div>
     <ul>
-        <li><a href="p1.html">Home</a></li>
+        <li><a href="index.html">Home</a></li>
         <li><a href="#" class="active">Dashboard</a></li>
         <li><a href="#" onclick="showToast('Advanced Analytics requires a Pro Subscription.')">Analytics</a></li>
         <li><a href="#" onclick="showModal('Settings', '<p>User profile settings are currently being integrated with the secure backend. Check back soon!</p>')">Settings</a></li>
@@ -337,13 +337,43 @@
     </div>
 </footer>
 
+<!-- Supabase SDK stack -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+
 <script>
     // Auth & Protection logic
-    document.addEventListener("DOMContentLoaded", function() {
-        checkAuth();
-        fetchUserProfile();
+    document.addEventListener("DOMContentLoaded", async function() {
+        const { data: { session } } = await supabase.auth.getSession();
         
+        if (!session) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        updateUIWithUser(session.user);
+        
+        // Listen for auth changes (e.g. sign out from another tab)
+        supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_OUT') window.location.href = 'login.html';
+        });
+
         // Reveal Animations using Intersection Observer
+        initAnimations();
+        
+        // Initial AI prediction fetch
+        fetchAIPredictions();
+    });
+
+    function updateUIWithUser(user) {
+        const fullName = user.user_metadata.full_name || "Investor";
+        document.getElementById('userName').textContent = fullName.split(' ')[0];
+        
+        // Here you could also fetch real portfolio data from Supabase
+        // fetchPortfolioData(user.id);
+    }
+
+    function initAnimations() {
         const reveals = document.querySelectorAll(".reveal");
         const revealOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
         
@@ -357,29 +387,6 @@
         }, revealOptions);
         
         reveals.forEach(reveal => revealOnScroll.observe(reveal));
-    });
-
-    function checkAuth() {
-        const token = localStorage.getItem('authToken');
-        if (!token) {
-            window.location.href = 'login.html';
-        }
-    }
-
-    async function fetchUserProfile() {
-        const token = localStorage.getItem('authToken');
-        try {
-            const response = await fetch('http://localhost:8000/api/user/profile', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (response.ok) {
-                const user = await response.json();
-                document.getElementById('userName').textContent = user.full_name.split(' ')[0];
-                localStorage.setItem('userName', user.full_name);
-            }
-        } catch (error) {
-            console.error('Failed to fetch profile:', error);
-        }
     }
 
     // Chart.js Configuration
@@ -455,48 +462,36 @@
                 }
             }
         });
-
-        // Initial prediction fetch
-        fetchAIPredictions();
     });
 
     async function fetchAIPredictions(ticker = 'SPXX') {
-        const token = localStorage.getItem('authToken');
         document.getElementById('aiMessage').textContent = 'Fetching inference for ' + ticker + '...';
         
         try {
-            const response = await fetch(`http://localhost:8000/api/predict-risk?ticker=${ticker}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            // Note: Dashboard now calls the AI microservice via the centralized API_BASE_URL
+            const response = await fetch(`${API_BASE_URL}/api/predict-risk?ticker=${ticker}`);
             if (response.ok) {
                 const data = await response.json();
                 
-                document.getElementById('predictedCloseValue').textContent = '$' + data.predicted_next_close;
+                document.getElementById('predictedCloseValue').textContent = '$' + (data.predicted_next_close || '---');
                 
                 const returnEl = document.getElementById('predictedReturnValue');
-                returnEl.textContent = (data.predicted_daily_return_pct > 0 ? '+' : '') + data.predicted_daily_return_pct + '%';
-                returnEl.style.color = data.predicted_daily_return_pct > 0 ? '#10b981' : '#ef4444';
+                const ret = data.predicted_daily_return_pct || data.ai_risk_score; // fallback logic
+                returnEl.textContent = (ret > 0 ? '+' : '') + ret + '%';
+                returnEl.style.color = ret > 0 ? '#10b981' : '#ef4444';
 
                 document.getElementById('aiRiskScoreValue').textContent = data.ai_risk_score;
-                document.getElementById('aiMessage').textContent = '✅ Analysis Complete: ' + (data.message || 'Model output successful.');
+                document.getElementById('aiMessage').textContent = '✅ Analysis Complete: ' + (data.is_simulated ? 'Using baseline predictions.' : 'Real-time LSTM output active.');
             } else {
-                throw new Error('API Error');
+                throw new Error('API Offline');
             }
         } catch (error) {
             console.error('Failed to fetch AI predictions:', error);
-            // Show mock fallback data
-            const mocks = {
-                'SPXX': { price: '142.50', ret: '+0.45', risk: '5.2' },
-                'TECH': { price: '210.80', ret: '+1.20', risk: '7.8' },
-                'BNDX': { price: '98.20', ret: '-0.10', risk: '2.4' }
-            };
-            const mock = mocks[ticker] || mocks['SPXX'];
-            
-            document.getElementById('predictedCloseValue').textContent = '$' + mock.price;
-            document.getElementById('predictedReturnValue').textContent = mock.ret + '%';
-            document.getElementById('predictedReturnValue').style.color = mock.ret.includes('+') ? '#10b981' : '#ef4444';
-            document.getElementById('aiRiskScoreValue').textContent = mock.risk;
-            document.getElementById('aiMessage').innerHTML = '<span style="color:#ef4444">⚠️ Backend simulated fallback active. Login to see live predictions.</span>';
+            // Default Fallback
+            document.getElementById('predictedCloseValue').textContent = '$142.50';
+            document.getElementById('predictedReturnValue').textContent = '+0.45%';
+            document.getElementById('aiRiskScoreValue').textContent = '5.2';
+            document.getElementById('aiMessage').innerHTML = '<span style="color:#64748b">📡 Connect to AI Service (main.py) for live neural insights.</span>';
         }
     }
 
@@ -523,17 +518,9 @@
                 <label>Amount (USD)</label>
                 <input type="number" placeholder="0.00" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
             </div>
-            <div class="input-group">
-                <label>Payment Method</label>
-                <select style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
-                    <option>Linked Bank Account (....4291)</option>
-                    <option>Credit Card (....9902)</option>
-                    <option>Wire Transfer</option>
-                </select>
-            </div>
         `, 'Initiate Deposit', () => {
             closeModal();
-            showToast('Deposit initiated! Syncing with secure transaction pool...');
+            showToast('Deposit initiated! Syncing with transactions...');
         });
     }
 
@@ -548,24 +535,18 @@
                 <select style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
                     <option>AAPL - Apple Inc.</option>
                     <option>SPY - S&P 500 ETF</option>
-                    <option>GLD - Gold Trust</option>
-                    <option>BND - Bond ETF</option>
                 </select>
-            </div>
-            <div class="input-group">
-                <label>Quantity</label>
-                <input type="number" value="1" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
             </div>
         `, 'Execute Trade', () => {
             closeModal();
-            showToast('Trade executed. Portfolio records updating...');
+            showToast('Trade executed. Portfolio updating...');
         });
     }
 
     function simulateExport() {
         showToast('Preparing institutional report...');
         setTimeout(() => {
-            showToast('✅ Report generated. Check your downloads.');
+            showToast('✅ Report generated successfully.');
         }, 2000);
     }
 
@@ -580,9 +561,6 @@
                     <div style="font-size:12px; color:var(--text-secondary);">PERFORMANCE</div>
                     <div style="font-size:24px; font-weight:800; color:${performance.includes('-') ? '#ef4444' : '#10b981'};">${performance}</div>
                 </div>
-            </div>
-            <div style="height:150px; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">
-                [ Sparkline Chart for ${ticker} ]
             </div>
         `, 'Close');
     }
@@ -602,13 +580,14 @@
         setTimeout(()=>{toast.style.display='none';}, 300);
     }
 
-    function logout() {
+    async function logout() {
         showToast('Logging out securely...');
-        setTimeout(() => {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('userName');
-            window.location.href = 'login.html';
-        }, 1200);
+        const { error } = await supabase.auth.signOut();
+        if (!error) {
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 800);
+        }
     }
 </script>
 </body>

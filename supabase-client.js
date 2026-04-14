@@ -6,7 +6,10 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // Change this to your Render/Railway URL when you deploy the backend!
 const API_BASE_URL = "http://localhost:8000"; 
 
-// Initialize the Supabase Client
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Initialize the Supabase Client (avoiding variable shadowing)
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Make the client available globally for the rest of the application
+window.supabase = supabaseClient;
 
 console.log("RAPOS: Supabase initialized. API Base:", API_BASE_URL);

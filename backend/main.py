@@ -173,6 +173,27 @@ def get_live_price(ticker: str):
             "percent_change": 0
         }
 
+@app.get("/api/search-stocks")
+def search_stocks(q: str):
+    """
+    Search for symbols/stocks by name.
+    """
+    try:
+        search_results = finnhub_client.symbol_lookup(q)
+        # Simplify results for the frontend
+        cleaned = []
+        for item in search_results.get('result', [])[:8]: # Limit to top 8
+            cleaned.append({
+                "symbol": item['symbol'],
+                "displaySymbol": item['displaySymbol'],
+                "description": item['description'],
+                "type": item['type']
+            })
+        return {"query": q, "results": cleaned}
+    except Exception as e:
+        print(f"Search Error: {e}")
+        return {"query": q, "results": [], "error": str(e)}
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

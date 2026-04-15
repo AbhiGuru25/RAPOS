@@ -124,6 +124,85 @@
             margin-top: 24px;
         }
 
+        .dashboard-container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        .sidebar {
+            width: 240px;
+            background: white;
+            border-right: 1px solid #e2e8f0;
+            padding: 24px 0;
+            flex-shrink: 0;
+        }
+
+        .sidebar-item {
+            padding: 12px 24px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .sidebar-item:hover, .sidebar-item.active {
+            color: var(--accent-primary);
+            background: rgba(37, 99, 235, 0.05);
+            border-right: 3px solid var(--accent-primary);
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 32px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Search Suggestions */
+        .search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            z-index: 2000;
+            max-height: 250px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .suggestion-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .suggestion-item:hover {
+            background: #f8fafc;
+        }
+
+        .suggestion-item .sym { font-weight: 800; color: var(--accent-primary); }
+        .suggestion-item .desc { font-size: 13px; color: var(--text-secondary); }
+
+        @media (max-width: 768px) {
+            .dashboard-container { flex-direction: column; }
+            .sidebar { width: 100%; display: flex; overflow-x: auto; padding: 0; }
+            .sidebar-item { border-right: none; border-bottom: 2px solid transparent; }
+            .sidebar-item.active { border-bottom: 2px solid var(--accent-primary); }
+        }
+
         /* AI Risk Overrides */
         .ai-card {
             background: var(--bg-primary);
@@ -240,28 +319,6 @@
             <div class="ai-card">
                 <div class="metric-label">AI Volatility Risk</div>
                 <div id="aiRiskScoreValue" class="metric-value" style="color: var(--danger);">Analyzing...</div>
-                <div style="font-size: 12px; margin-top: 8px; color: var(--text-secondary);">Scale 1-10 (10 = High Risk)</div>
-            </div>
-        </div>
-
-        <div style="background: rgba(37, 99, 235, 0.05); padding: 16px; border-radius: 8px; border-left: 4px solid var(--accent-primary);">
-            <p id="aiMessage" style="color: var(--text-primary); font-weight: 500; font-size: 14px;">Establishing connection to backend inference engine...</p>
-        </div>
-    </div>
-
-    <!-- Portfolio Holdings -->
-    <div class="portfolio-section reveal">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-            <div class="section-title" style="margin-bottom: 0;">Portfolio Holdings</div>
-            <button class="btn btn-primary" onclick="showTradeModal()" style="padding: 8px 16px; font-size: 14px;">+ Add Asset</button>
-        </div>
-
-        <div id="holdingsList">
-            <!-- Dynamic Assets Loaded from Supabase -->
-            <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
-                <p>Establishing secure connection to your holdings...</p>
-            </div>
-        </div>
 
         <div class="action-buttons" style="margin-top: 32px; border-top: 1px solid #e2e8f0; padding-top: 24px;">
             <button class="btn btn-secondary" onclick="simulateExport()">Export Report</button>
@@ -560,6 +617,108 @@
         }
     }
 
+    // --- Tab Management ---
+    function switchTab(tabId, el) {
+        // Update active class on side buttons
+        document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+        el.classList.add('active');
+
+        // Show/Hide sections
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+
+        // Init Widgets if needed
+        if (tabId === 'marketTab') {
+            initTradingView();
+        }
+    }
+
+    function initTradingView() {
+        if (typeof TradingView !== 'undefined') {
+            new TradingView.widget({
+                "width": "100%",
+                "height": "100%",
+                "symbol": "NASDAQ:AAPL",
+                "interval": "D",
+                "timezone": "Etc/UTC",
+                "theme": "light",
+                "style": "1",
+                "locale": "en",
+                "toolbar_bg": "#f1f3f6",
+                "enable_publishing": false,
+                "allow_symbol_change": true,
+                "container_id": "tradingview_adv"
+            });
+        } else {
+            // Load Script if missing
+            const script = document.createElement('script');
+            script.src = "https://s3.tradingview.com/tv.js";
+            script.onload = () => initTradingView();
+            document.head.appendChild(script);
+        }
+    }
+
+    // --- Smart Stock Search ---
+    let searchTimeout;
+    function setupSearchAutocomplete() {
+        const input = document.getElementById('addAssetName');
+        if (!input) return;
+
+        input.addEventListener('input', (e) => {
+            const query = e.target.value;
+            clearTimeout(searchTimeout);
+            
+            if (query.length < 2) {
+                hideSuggestions();
+                return;
+            }
+
+            searchTimeout = setTimeout(async () => {
+                try {
+                    const res = await fetch(`${API_BASE_URL}/api/search-stocks?q=${query}`);
+                    const data = await res.json();
+                    renderSuggestions(data.results || []);
+                } catch (e) { console.error('Search failed', e); }
+            }, 300);
+        });
+    }
+
+    function renderSuggestions(results) {
+        const list = document.getElementById('searchSuggestions');
+        if (!results.length) {
+            hideSuggestions();
+            return;
+        }
+
+        list.innerHTML = results.map(item => `
+            <div class="suggestion-item" onclick="selectSuggestion('${item.symbol}', '${item.description}', '${item.type}')">
+                <div>
+                    <span class="sym">${item.displaySymbol}</span>
+                    <span class="desc" style="margin-left:8px;">${item.description}</span>
+                </div>
+                <span class="badge" style="background:#f1f5f9; color:#64748b; font-size:10px;">${item.type}</span>
+            </div>
+        `).join('');
+        list.style.display = 'block';
+    }
+
+    function hideSuggestions() {
+        const list = document.getElementById('searchSuggestions');
+        if (list) list.style.display = 'none';
+    }
+
+    function selectSuggestion(symbol, description, type) {
+        document.getElementById('addTicker').value = symbol;
+        document.getElementById('addAssetName').value = description;
+        
+        // Auto-match type
+        const typeSelect = document.getElementById('addAssetType');
+        if (type.includes('Common Stock')) typeSelect.value = 'Stocks';
+        else if (type.includes('Crypto')) typeSelect.value = 'Crypto';
+        
+        hideSuggestions();
+    }
+
     // Modal Core logic
     function showModal(title, bodyHtml, confirmText = 'Confirm', onConfirm = closeModal) {
         document.getElementById('modalTitle').textContent = title;
@@ -570,6 +729,11 @@
         
         const overlay = document.getElementById('modalOverlay');
         overlay.classList.add('active');
+
+        // Setup search if it's the trade modal
+        if (document.getElementById('addAssetName')) {
+            setupSearchAutocomplete();
+        }
     }
 
     function closeModal() {
@@ -579,14 +743,15 @@
     // Real Trade Modal & Savings logic
     function showTradeModal() {
         showModal('Add New Asset', `
-            <div class="input-group" style="margin-bottom:15px;">
-                <label style="display:block; margin-bottom:8px; font-weight:600;">Asset Name</label>
-                <input type="text" id="addAssetName" placeholder="e.g. Tesla Motors" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+            <div class="input-group" style="margin-bottom:15px; position:relative;">
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Search Asset Name</label>
+                <input type="text" id="addAssetName" autocomplete="off" placeholder="e.g. Apple or Bitcoin" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd;">
+                <div id="searchSuggestions" class="search-suggestions"></div>
             </div>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px;">
                 <div class="input-group">
                     <label style="display:block; margin-bottom:8px; font-weight:600;">Ticker</label>
-                    <input type="text" id="addTicker" placeholder="TSLA" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+                    <input type="text" id="addTicker" placeholder="AAPL" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
                 </div>
                 <div class="input-group">
                     <label style="display:block; margin-bottom:8px; font-weight:600;">Asset Type</label>

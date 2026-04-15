@@ -250,67 +250,24 @@
     </div>
 
     <!-- Portfolio Holdings -->
-        <div class="portfolio-item" onclick="showAssetDetail('Apple Inc.', 'AAPL', '$35,200', '8.3%')">
-            <div style="display: flex; gap: 16px; align-items: center;">
-                <div style="width: 40px; height: 40px; background: #f1f5f9; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text-secondary);">APL</div>
-                <div>
-                    <div class="portfolio-item-name">Apple Inc. (AAPL)</div>
-                    <p style="margin: 0; font-size: 13px; color: var(--text-secondary);">Tech - Large Cap</p>
-                </div>
-            </div>
-            <div style="text-align: right;">
-                <div class="portfolio-item-value">$35,200</div>
-                <span class="badge positive">↑ 8.3%</span>
+    <div class="portfolio-section reveal">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <div class="section-title" style="margin-bottom: 0;">Portfolio Holdings</div>
+            <button class="btn btn-primary" onclick="showTradeModal()" style="padding: 8px 16px; font-size: 14px;">+ Add Asset</button>
+        </div>
+
+        <div id="holdingsList">
+            <!-- Dynamic Assets Loaded from Supabase -->
+            <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                <p>Establishing secure connection to your holdings...</p>
             </div>
         </div>
 
-        <div class="portfolio-item" onclick="showAssetDetail('Vanguard Total Bond', 'BND', '$28,500', '2.1%')">
-            <div style="display: flex; gap: 16px; align-items: center;">
-                <div style="width: 40px; height: 40px; background: #f1f5f9; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text-secondary);">BND</div>
-                <div>
-                    <div class="portfolio-item-name">Vanguard Total Bond (BND)</div>
-                    <p style="margin: 0; font-size: 13px; color: var(--text-secondary);">Fixed Income</p>
-                </div>
-            </div>
-            <div style="text-align: right;">
-                <div class="portfolio-item-value">$28,500</div>
-                <span class="badge positive">↑ 2.1%</span>
-            </div>
-        </div>
-
-        <div class="portfolio-item" onclick="showAssetDetail('Gold ETF', 'GLD', '$22,100', '4.5%')">
-            <div style="display: flex; gap: 16px; align-items: center;">
-                <div style="width: 40px; height: 40px; background: #f1f5f9; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text-secondary);">GLD</div>
-                <div>
-                    <div class="portfolio-item-name">Gold ETF (GLD)</div>
-                    <p style="margin: 0; font-size: 13px; color: var(--text-secondary);">Commodities</p>
-                </div>
-            </div>
-            <div style="text-align: right;">
-                <div class="portfolio-item-value">$22,100</div>
-                <span class="badge positive">↑ 4.5%</span>
-            </div>
-        </div>
-
-        <div class="portfolio-item" onclick="showAssetDetail('S&P 500 Index', 'SPY', '$39,630', '-1.2%')">
-            <div style="display: flex; gap: 16px; align-items: center;">
-                <div style="width: 40px; height: 40px; background: #f1f5f9; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text-secondary);">SPY</div>
-                <div>
-                    <div class="portfolio-item-name">S&P 500 Index (SPY)</div>
-                    <p style="margin: 0; font-size: 13px; color: var(--text-secondary);">Equity Broad Market</p>
-                </div>
-            </div>
-            <div style="text-align: right;">
-                <div class="portfolio-item-value">$39,630</div>
-                <span class="badge negative">↓ 1.2%</span>
-            </div>
-        </div>
-
-        <div class="action-buttons">
-            <button class="btn btn-primary" onclick="simulateDeposit()">Deposit Funds</button>
-            <button class="btn btn-secondary" onclick="simulateTrade()">Trade Assets</button>
+        <div class="action-buttons" style="margin-top: 32px; border-top: 1px solid #e2e8f0; padding-top: 24px;">
             <button class="btn btn-secondary" onclick="simulateExport()">Export Report</button>
+            <button class="btn btn-secondary" onclick="showModal('Platform Update', '<p>Institutional trading and fund deposits are currently in beta. Your cloud-saved holdings are fully managed through the Add Asset system.</p>')">Platform Status</button>
         </div>
+    </div>
     </div>
 </div>
 
@@ -342,6 +299,11 @@
 <script src="supabase-client.js"></script>
 
 <script>
+    // Global state for dynamic data
+    let myHoldings = [];
+    let allocationChart;
+    let currentUser = null;
+
     // Auth & Protection logic
     document.addEventListener("DOMContentLoaded", async function() {
         const { data: { session } } = await supabase.auth.getSession();
@@ -351,6 +313,7 @@
             return;
         }
 
+        currentUser = session.user;
         updateUIWithUser(session.user);
         
         // Listen for auth changes (e.g. sign out from another tab)
@@ -363,14 +326,93 @@
         
         // Initial AI prediction fetch
         fetchAIPredictions();
+
+        // 🚀 Fetch real cloud-saved holdings
+        fetchHoldings();
     });
+
+    async function fetchHoldings() {
+        try {
+            const { data, error } = await supabase
+                .from('portfolios')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+
+            myHoldings = data || [];
+            renderHoldings();
+            updateCharts();
+            updateTotalStats();
+        } catch (error) {
+            console.error('Error fetching holdings:', error);
+            showToast('Failed to fetch portfolio data.');
+            renderHoldings([]); // empty state
+        }
+    }
+
+    function renderHoldings() {
+        const list = document.getElementById('holdingsList');
+        if (myHoldings.length === 0) {
+            list.innerHTML = `
+                <div style="text-align: center; padding: 40px; background: rgba(0,0,0,0.02); border-radius: 12px; border: 2px dashed #e2e8f0;">
+                    <p style="color: var(--text-secondary); margin-bottom: 16px;">Your portfolio is currently empty.</p>
+                    <button class="btn btn-primary" onclick="showTradeModal()">Add Your First Asset</button>
+                </div>
+            `;
+            return;
+        }
+
+        list.innerHTML = myHoldings.map(asset => `
+            <div class="portfolio-item" onclick="showAssetDetail('${asset.asset_name}', '${asset.ticker}', '$${asset.value.toLocaleString()}', '${asset.performance_pct}%')">
+                <div style="display: flex; gap: 16px; align-items: center;">
+                    <div style="width: 40px; height: 40px; background: #f1f5f9; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--accent-primary); font-size: 12px;">
+                        ${asset.ticker.substring(0, 3)}
+                    </div>
+                    <div>
+                        <div class="portfolio-item-name">${asset.asset_name} (${asset.ticker})</div>
+                        <p style="margin: 0; font-size: 13px; color: var(--text-secondary);">${asset.asset_type || 'Uncategorized'}</p>
+                    </div>
+                </div>
+                <div style="text-align: right; display: flex; align-items: center; gap: 20px;">
+                    <div>
+                        <div class="portfolio-item-value">$${asset.value.toLocaleString()}</div>
+                        <span class="badge ${asset.performance_pct >= 0 ? 'positive' : 'negative'}">
+                            ${asset.performance_pct >= 0 ? '↑' : '↓'} ${Math.abs(asset.performance_pct)}%
+                        </span>
+                    </div>
+                    <button class="modal-close" onclick="event.stopPropagation(); deleteAsset('${asset.id}')" style="position: static; font-size: 18px; color: var(--danger); opacity: 0.5 hover:opacity: 1;">&times;</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function updateTotalStats() {
+        const total = myHoldings.reduce((sum, h) => sum + parseFloat(h.value), 0);
+        document.getElementById('portfolioValue').textContent = '$' + total.toLocaleString();
+    }
+
+    function updateCharts() {
+        if (!allocationChart) return;
+
+        // Group by type for the donut chart
+        const groups = {};
+        myHoldings.forEach(h => {
+            const type = h.asset_type || 'Others';
+            groups[type] = (groups[type] || 0) + parseFloat(h.value);
+        });
+
+        const labels = Object.keys(groups);
+        const data = Object.values(groups);
+
+        allocationChart.data.labels = labels;
+        allocationChart.data.datasets[0].data = data;
+        allocationChart.update();
+    }
 
     function updateUIWithUser(user) {
         const fullName = user.user_metadata.full_name || "Investor";
         document.getElementById('userName').textContent = fullName.split(' ')[0];
-        
-        // Here you could also fetch real portfolio data from Supabase
-        // fetchPortfolioData(user.id);
     }
 
     function initAnimations() {
@@ -396,13 +438,13 @@
 
         // Portfolio Allocation Donut Chart
         const allocationCtx = document.getElementById('allocationChart').getContext('2d');
-        new Chart(allocationCtx, {
+        allocationChart = new Chart(allocationCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Stocks', 'Bonds', 'Commodities'],
+                labels: ['Loading...'],
                 datasets: [{
-                    data: [74830, 28500, 22100],
-                    backgroundColor: ['#2563eb', '#0ea5e9', '#cbd5e1'],
+                    data: [1],
+                    backgroundColor: ['#2563eb', '#0ea5e9', '#cbd5e1', '#6366f1', '#8b5cf6', '#ec4899'],
                     borderWidth: 0,
                     hoverOffset: 4
                 }]
@@ -417,7 +459,7 @@
             }
         });
 
-        // Performance Line Chart
+        // Performance Line Chart (Simulated for Now)
         const performanceCtx = document.getElementById('performanceChart').getContext('2d');
         
         let gradient = performanceCtx.createLinearGradient(0, 0, 0, 300);
@@ -468,7 +510,6 @@
         document.getElementById('aiMessage').textContent = 'Fetching inference for ' + ticker + '...';
         
         try {
-            // Note: Dashboard now calls the AI microservice via the centralized API_BASE_URL
             const response = await fetch(`${API_BASE_URL}/api/predict-risk?ticker=${ticker}`);
             if (response.ok) {
                 const data = await response.json();
@@ -511,36 +552,88 @@
         document.getElementById('modalOverlay').classList.remove('active');
     }
 
-    // Interaction Simulations
-    function simulateDeposit() {
-        showModal('Deposit Funds', `
-            <div class="input-group">
-                <label>Amount (USD)</label>
-                <input type="number" placeholder="0.00" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+    // Real Trade Modal & Savings logic
+    function showTradeModal() {
+        showModal('Add New Asset', `
+            <div class="input-group" style="margin-bottom:15px;">
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Asset Name</label>
+                <input type="text" id="addAssetName" placeholder="e.g. Tesla Motors" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
             </div>
-        `, 'Initiate Deposit', () => {
-            closeModal();
-            showToast('Deposit initiated! Syncing with transactions...');
-        });
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px;">
+                <div class="input-group">
+                    <label style="display:block; margin-bottom:8px; font-weight:600;">Ticker</label>
+                    <input type="text" id="addTicker" placeholder="TSLA" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+                </div>
+                <div class="input-group">
+                    <label style="display:block; margin-bottom:8px; font-weight:600;">Asset Type</label>
+                    <select id="addAssetType" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+                        <option value="Stocks">Stocks</option>
+                        <option value="Bonds">Bonds</option>
+                        <option value="Crypto">Crypto</option>
+                        <option value="Commodities">Commodities</option>
+                    </select>
+                </div>
+            </div>
+            <div class="input-group">
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Total Invested Value ($)</label>
+                <input type="number" id="addValue" placeholder="5000" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+            </div>
+        `, 'Save to Cloud', saveAsset);
     }
 
-    function simulateTrade() {
-        showModal('Trade Assets', `
-            <div style="display:flex; gap:10px; margin-bottom:15px;">
-                <button class="btn btn-primary" style="flex:1;">Buy</button>
-                <button class="btn btn-secondary" style="flex:1;">Sell</button>
-            </div>
-            <div class="input-group">
-                <label>Select Asset</label>
-                <select style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
-                    <option>AAPL - Apple Inc.</option>
-                    <option>SPY - S&P 500 ETF</option>
-                </select>
-            </div>
-        `, 'Execute Trade', () => {
+    async function saveAsset() {
+        const name = document.getElementById('addAssetName').value;
+        const ticker = document.getElementById('addTicker').value.toUpperCase();
+        const type = document.getElementById('addAssetType').value;
+        const val = parseFloat(document.getElementById('addValue').value);
+
+        if (!name || !ticker || isNaN(val)) {
+            showToast('Please fill all fields correctly.');
+            return;
+        }
+
+        showToast('Saving to security vault...');
+        
+        try {
+            const { error } = await supabase
+                .from('portfolios')
+                .insert([{
+                    user_id: currentUser.id,
+                    asset_name: name,
+                    ticker: ticker,
+                    asset_type: type,
+                    value: val,
+                    performance_pct: (Math.random() * 5).toFixed(1) // simulated for new assets
+                }]);
+
+            if (error) throw error;
+
             closeModal();
-            showToast('Trade executed. Portfolio updating...');
-        });
+            showToast('✅ Asset saved! Updating portfolio...');
+            fetchHoldings(); // Reload
+        } catch (error) {
+            console.error('Error saving asset:', error);
+            showToast('Failed to save asset. Check your database connection.');
+        }
+    }
+
+    async function deleteAsset(id) {
+        if (!confirm('Are you sure you want to remove this asset?')) return;
+        
+        showToast('Removing asset...');
+        try {
+            const { error } = await supabase
+                .from('portfolios')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
+            showToast('✅ Asset removed.');
+            fetchHoldings();
+        } catch (error) {
+            console.error('Error deleting asset:', error);
+            showToast('Failed to delete asset.');
+        }
     }
 
     function simulateExport() {
@@ -562,6 +655,7 @@
                     <div style="font-size:24px; font-weight:800; color:${performance.includes('-') ? '#ef4444' : '#10b981'};">${performance}</div>
                 </div>
             </div>
+            <p style="font-size: 14px; line-height: 1.6;">AI-powered analysis for ${ticker} is available in the Deep Learning Insights section above. Use the selector to get real-time price predictions.</p>
         `, 'Close');
     }
 

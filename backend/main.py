@@ -4,10 +4,16 @@ import pandas as pd
 import numpy as np
 import torch
 import os
+import finnhub
 from typing import List
 
 # Initialize FastAPI app
-app = FastAPI(title="RAPOS AI Prediction Service", version="2.0.0")
+app = FastAPI(title="RAPOS AI Prediction Service", version="2.0.1")
+
+# --- MARKET DATA CLIENT ---
+# I will use the key you provided as a fallback/env var
+FINNHUB_KEY = os.getenv("FINNHUB_API_KEY", "d7fucvhr01qqb8rhld4gd7fucvhr01qqb8rhld50")
+finnhub_client = finnhub.Client(api_key=FINNHUB_KEY)
 
 # --- CORS SETUP ---
 app.add_middleware(
@@ -124,13 +130,39 @@ def predict_risk(ticker: str = 'SPXX'):
             "model_type": "LSTM Neural Network",
             "is_simulated": False
         }
-    except Exception as e:
-        # Extreme fallback
+
+# --- REAL-TIME MARKET DATA ---
+
+@app.get("/api/live-price")
+def get_live_price(ticker: str):
+    """
+    Fetches real-time price from Finnhub.
+    """
+    try:
+        # Quote data from Finnhub
+        # c: Current price, d: Change, dp: Percent change
+        quote = finnhub_client.quote(ticker.upper())
+        
+        if not quote or quote['c'] == 0:
+            raise HTTPException(status_code=404, detail="Ticker not found or no data.")
+
         return {
-            "ticker": ticker, 
-            "ai_risk_score": 6.5, 
-            "is_simulated": True, 
-            "error": str(e)
+            "ticker": ticker.upper(),
+            "current_price": round(float(quote['c']), 2),
+            "change": round(float(quote['d']), 2),
+            "percent_change": round(float(quote['dp']), 2),
+            "high": round(float(quote['h']), 2),
+            "low": round(float(quote['l']), 2),
+            "previous_close": round(float(quote['pc']), 2),
+            "timestamp": os.getlogin() if os.name == 'nt' else 'render' # logging metadata
+        }
+    except Exception as e:
+        print(f"Market Data Error: {e}")
+        return {
+            "ticker": ticker,
+            "error": "Failed to fetch live price",
+            "current_price": 0,
+            "percent_change": 0
         }
 
 if __name__ == "__main__":

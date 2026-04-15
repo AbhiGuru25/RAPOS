@@ -340,14 +340,38 @@
 
             if (error) throw error;
 
-            myHoldings = data || [];
+            const baseHoldings = data || [];
+            
+            // 🚀 Enrich with Real-Time Prices
+            showToast('Fetching live market prices...', 1500);
+            
+            const enrichPromises = baseHoldings.map(async (asset) => {
+                try {
+                    const priceRes = await fetch(`${API_BASE_URL}/api/live-price?ticker=${asset.ticker}`);
+                    if (priceRes.ok) {
+                        const priceData = await priceRes.json();
+                        return {
+                            ...asset,
+                            current_price: priceData.current_price,
+                            live_value: (asset.quantity || 1) * priceData.current_price,
+                            performance_pct: priceData.percent_change || asset.performance_pct,
+                            is_live: true
+                        };
+                    }
+                } catch (e) { console.error('Price fetch failed for', asset.ticker); }
+                
+                return { ...asset, live_value: asset.value, is_live: false };
+            });
+
+            myHoldings = await Promise.all(enrichPromises);
+            
             renderHoldings();
             updateCharts();
             updateTotalStats();
         } catch (error) {
             console.error('Error fetching holdings:', error);
-            showToast('Failed to fetch portfolio data.');
-            renderHoldings([]); // empty state
+            showToast('Failed to sync portfolio.');
+            renderHoldings([]); 
         }
     }
 
@@ -364,21 +388,21 @@
         }
 
         list.innerHTML = myHoldings.map(asset => `
-            <div class="portfolio-item" onclick="showAssetDetail('${asset.asset_name}', '${asset.ticker}', '$${asset.value.toLocaleString()}', '${asset.performance_pct}%')">
+            <div class="portfolio-item" onclick="showAssetDetail('${asset.asset_name}', '${asset.ticker}', '$${(asset.live_value || asset.value).toLocaleString()}', '${asset.performance_pct}%')">
                 <div style="display: flex; gap: 16px; align-items: center;">
                     <div style="width: 40px; height: 40px; background: #f1f5f9; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--accent-primary); font-size: 12px;">
                         ${asset.ticker.substring(0, 3)}
                     </div>
                     <div>
                         <div class="portfolio-item-name">${asset.asset_name} (${asset.ticker})</div>
-                        <p style="margin: 0; font-size: 13px; color: var(--text-secondary);">${asset.asset_type || 'Uncategorized'}</p>
+                        <p style="margin: 0; font-size: 13px; color: var(--text-secondary);">${asset.quantity || 1} Shares @ $${asset.current_price || '---'}</p>
                     </div>
                 </div>
                 <div style="text-align: right; display: flex; align-items: center; gap: 20px;">
                     <div>
-                        <div class="portfolio-item-value">$${asset.value.toLocaleString()}</div>
+                        <div class="portfolio-item-value">$${(asset.live_value || asset.value).toLocaleString()}</div>
                         <span class="badge ${asset.performance_pct >= 0 ? 'positive' : 'negative'}">
-                            ${asset.performance_pct >= 0 ? '↑' : '↓'} ${Math.abs(asset.performance_pct)}%
+                            ${asset.is_live ? 'LIVE ' : ''}${asset.performance_pct >= 0 ? '↑' : '↓'} ${Math.abs(asset.performance_pct)}%
                         </span>
                     </div>
                     <button class="modal-close" onclick="event.stopPropagation(); deleteAsset('${asset.id}')" style="position: static; font-size: 18px; color: var(--danger); opacity: 0.5 hover:opacity: 1;">&times;</button>
@@ -388,7 +412,7 @@
     }
 
     function updateTotalStats() {
-        const total = myHoldings.reduce((sum, h) => sum + parseFloat(h.value), 0);
+        const total = myHoldings.reduce((sum, h) => sum + parseFloat(h.live_value || h.value), 0);
         document.getElementById('portfolioValue').textContent = '$' + total.toLocaleString();
     }
 
@@ -399,7 +423,7 @@
         const groups = {};
         myHoldings.forEach(h => {
             const type = h.asset_type || 'Others';
-            groups[type] = (groups[type] || 0) + parseFloat(h.value);
+            groups[type] = (groups[type] || 0) + parseFloat(h.live_value || h.value);
         });
 
         const labels = Object.keys(groups);
@@ -575,24 +599,24 @@
                 </div>
             </div>
             <div class="input-group">
-                <label style="display:block; margin-bottom:8px; font-weight:600;">Total Invested Value ($)</label>
-                <input type="number" id="addValue" placeholder="5000" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Number of Shares (Quantity)</label>
+                <input type="number" id="addQuantity" placeholder="10.0" step="0.01" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
             </div>
-        `, 'Save to Cloud', saveAsset);
+        `, 'Add to Live Portfolio', saveAsset);
     }
 
     async function saveAsset() {
         const name = document.getElementById('addAssetName').value;
         const ticker = document.getElementById('addTicker').value.toUpperCase();
         const type = document.getElementById('addAssetType').value;
-        const val = parseFloat(document.getElementById('addValue').value);
+        const qty = parseFloat(document.getElementById('addQuantity').value);
 
-        if (!name || !ticker || isNaN(val)) {
+        if (!name || !ticker || isNaN(qty)) {
             showToast('Please fill all fields correctly.');
             return;
         }
 
-        showToast('Saving to security vault...');
+        showToast('Encrypting and saving...');
         
         try {
             const { error } = await supabase
@@ -602,18 +626,19 @@
                     asset_name: name,
                     ticker: ticker,
                     asset_type: type,
-                    value: val,
-                    performance_pct: (Math.random() * 5).toFixed(1) // simulated for new assets
+                    quantity: qty,
+                    value: 0, // value will be calculated live
+                    performance_pct: 0
                 }]);
 
             if (error) throw error;
 
             closeModal();
-            showToast('✅ Asset saved! Updating portfolio...');
-            fetchHoldings(); // Reload
+            showToast('✅ Live tracking enabled!');
+            fetchHoldings(); 
         } catch (error) {
             console.error('Error saving asset:', error);
-            showToast('Failed to save asset. Check your database connection.');
+            showToast('Failed to save asset. Check column names.');
         }
     }
 

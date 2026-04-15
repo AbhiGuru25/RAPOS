@@ -194,6 +194,41 @@ def search_stocks(q: str):
         print(f"Search Error: {e}")
         return {"query": q, "results": [], "error": str(e)}
 
+# --- PORTFOLIO OPTIMIZATION ---
+
+RISK_PROFILES = {
+    "Conservative": {"Stocks": 0.20, "Crypto": 0.05, "Bonds": 0.60, "Cash": 0.15},
+    "Moderate": {"Stocks": 0.45, "Crypto": 0.15, "Bonds": 0.30, "Cash": 0.10},
+    "Aggressive": {"Stocks": 0.65, "Crypto": 0.25, "Bonds": 0.05, "Cash": 0.05}
+}
+
+@app.get("/api/rebalance")
+def rebalance_portfolio(total_value: float, profile: str = "Moderate"):
+    """
+    Calculates the target dollar amounts for each asset class based on a profile.
+    """
+    if profile not in RISK_PROFILES:
+        profile = "Moderate"
+        
+    targets = RISK_PROFILES[profile]
+    report = []
+    
+    for asset_type, weight in targets.items():
+        target_value = round(total_value * weight, 2)
+        report.append({
+            "asset_type": asset_type,
+            "target_weight": f"{int(weight*100)}%",
+            "target_value": target_value,
+            "description": f"Targeting {int(weight*100)}% allocation for {asset_type}."
+        })
+        
+    return {
+        "profile": profile,
+        "total_value": total_value,
+        "optimization_report": report,
+        "advice": f"Optimization complete for {profile} profile. Adjust holdings to match target values."
+    }
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

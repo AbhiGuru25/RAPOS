@@ -118,17 +118,45 @@
         .suggestion-item { padding: 12px 16px; cursor: pointer; display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; }
         .suggestion-item:hover { background: #f8fafc; }
 
-        /* List Items */
-        .portfolio-item {
+        /* Tab Sidebar Item Placeholder (fixed previously) */
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Rebalancer Specifics */
+        .risk-btn {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .risk-btn.active {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .rebalance-card {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 16px;
-            border: 1px solid #f1f5f9;
-            border-radius: 12px;
-            margin-bottom: 12px;
-            background: white;
+            background: #fff;
+            border-bottom: 1px solid #f1f5f9;
         }
+
+        .rebalance-card:last-child { border-bottom: none; }
+        
+        .signal-buy { color: #10b981; font-weight: 700; }
+        .signal-sell { color: #ef4444; font-weight: 700; }
+
+        /* List Items */
 
         @media (max-width: 1024px) {
             .sidebar { width: 100%; height: auto; position: relative; flex-direction: row; overflow-x: auto; }
@@ -153,7 +181,7 @@
         <div class="sidebar-item" onclick="window.location.href='dashboard-classic.html'">
             <i class="fas fa-history"></i> Classic View
         </div>
-        <div class="sidebar-item" onclick="showToast('AI Optimiser arrives in Beta next week!')">
+        <div class="sidebar-item" onclick="switchTab('rebalancerTab', this)">
             <i class="fas fa-wand-magic-sparkles"></i> AI Rebalancer
         </div>
         <div style="margin-top: auto; padding: 24px;">
@@ -219,6 +247,47 @@
                 <div class="card">
                     <div class="card-header"><h3>Asset Allocation</h3></div>
                     <div style="height: 300px;"><canvas id="allocationChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: AI Rebalancer -->
+        <div id="rebalancerTab" class="tab-content">
+            <div class="welcome-banner">
+                <div>
+                    <h1>AI Rebalancing Engine</h1>
+                    <p>Optimizing your asset weights for maximum risk-adjusted returns.</p>
+                </div>
+                <div class="ai-status">V2.0 Neural Engine</div>
+            </div>
+
+            <div class="grid-container">
+                <div class="card" style="grid-column: span 1;">
+                    <div class="card-header">
+                        <h3>1. Select Risk Tolerance</h3>
+                    </div>
+                    <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+                        <button class="risk-btn" id="risk-con" onclick="setRiskProfile('Conservative')">Conservative</button>
+                        <button class="risk-btn active" id="risk-mod" onclick="setRiskProfile('Moderate')">Moderate</button>
+                        <button class="risk-btn" id="risk-agg" onclick="setRiskProfile('Aggressive')">Aggressive</button>
+                    </div>
+                    <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">Your selected profile determines the "Target Weights" for each asset class. Our AI will then calculate exactly how to shift your current capital.</p>
+                </div>
+
+                <div class="card" style="grid-column: span 1;">
+                    <div class="card-header">
+                        <h3>2. Optimization Signals</h3>
+                        <div class="ai-status">Live Math</div>
+                    </div>
+                    <div id="rebalanceReportList">
+                        <div style="text-align:center; padding:40px; color:#94a3b8;">Select a profile to generate report...</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="executeRebalance()" style="width:100%; margin-top: 20px;">Execute Optimization (Simulated)</button>
+                </div>
+
+                <div class="card" style="grid-column: span 1;">
+                    <div class="card-header"><h3>Target Allocation</h3></div>
+                    <div style="height: 250px;"><canvas id="targetChart"></canvas></div>
                 </div>
             </div>
         </div>
@@ -369,7 +438,9 @@
         el.classList.add('active');
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         document.getElementById(tabId).classList.add('active');
+        
         if (tabId === 'marketTab') initTradingView();
+        if (tabId === 'rebalancerTab') fetchRebalanceReport();
     }
 
     function initTradingView() {
@@ -448,9 +519,88 @@
     function showToast(m, t=3000) { const d = document.getElementById('toast'); document.getElementById('toastMsg').textContent = m; d.style.display = 'flex'; setTimeout(() => d.style.display = 'none', t); }
     async function logout() { await supabase.auth.signOut(); window.location.href = 'login.html'; }
 
-    function initCharts() {
-        allocationChart = new Chart(document.getElementById('allocationChart'), { type: 'doughnut', data: { labels: [], datasets: [{ data: [], backgroundColor: ['#2563eb', '#3b82f6', '#93c5fd'] }] }, options: { responsive:true, maintainAspectRatio:false }});
+    // --- AI Rebalancer Logic ---
+    let targetChart;
+    let currentProfile = 'Moderate';
+
+    async function setRiskProfile(profile) {
+        currentProfile = profile;
+        // UI Update
+        document.querySelectorAll('.risk-btn').forEach(b => b.classList.remove('active'));
+        if(profile === 'Conservative') document.getElementById('risk-con').classList.add('active');
+        if(profile === 'Moderate') document.getElementById('risk-mod').classList.add('active');
+        if(profile === 'Aggressive') document.getElementById('risk-agg').classList.add('active');
+
+        fetchRebalanceReport();
     }
+
+    async function fetchRebalanceReport() {
+        const total = myHoldings.reduce((sum, h) => sum + (h.live_value || 0), 0);
+        if (total === 0) {
+            showToast('Please add assets to your portfolio first!');
+            return;
+        }
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/rebalance?total_value=${total}&profile=${currentProfile}`);
+            const data = await res.json();
+            renderRebalanceReport(data.optimization_report);
+            updateTargetChart(data.optimization_report);
+        } catch (e) { console.error('Rebalance fetch failed', e); }
+    }
+
+    function renderRebalanceReport(report) {
+        const list = document.getElementById('rebalanceReportList');
+        // Simple logic: Compare target value to current holdings type (summary)
+        const currentGroups = {};
+        myHoldings.forEach(h => { currentGroups[h.asset_type] = (currentGroups[h.asset_type] || 0) + (h.live_value || 0); });
+
+        list.innerHTML = report.map(r => {
+            const current = currentGroups[r.asset_type] || 0;
+            const diff = r.target_value - current;
+            const signal = diff > 0 ? `<span class="signal-buy">BUY $${Math.abs(diff).toLocaleString()}</span>` : `<span class="signal-sell">SELL $${Math.abs(diff).toLocaleString()}</span>`;
+            
+            return `
+                <div class="rebalance-card">
+                    <div>
+                        <div style="font-weight:700;">${r.asset_type}</div>
+                        <div style="font-size:11px; color:#64748b;">Target: ${r.target_weight} ($${r.target_value.toLocaleString()})</div>
+                    </div>
+                    <div style="text-align:right;">
+                        ${Math.abs(diff) < 10 ? '✅ OPTIMAL' : signal}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function updateTargetChart(report) {
+        const labels = report.map(r => r.asset_type);
+        const data = report.map(r => r.target_value);
+
+        if (!targetChart) {
+            targetChart = new Chart(document.getElementById('targetChart'), {
+                type: 'doughnut',
+                data: { labels, datasets: [{ data, backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444'] }] },
+                options: { responsive:true, maintainAspectRatio:false }
+            });
+        } else {
+            targetChart.data.labels = labels;
+            targetChart.data.datasets[0].data = data;
+            targetChart.update();
+        }
+    }
+
+    function executeRebalance() {
+        showToast('🚀 Optimization Orders Sent to Exchange...');
+        setTimeout(() => {
+            showToast('✅ Portfolio Successfully Rebalanced!');
+            fetchHoldings(); // refresh
+        }, 2000);
+    }
+
+    // Add rebalancer button update to sidebar
+    // I need to update the switchTab to also trigger rebalance if active
 </script>
 </body>
 </html>

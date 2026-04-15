@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="s1.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root {
             --bg-primary: #ffffff;
@@ -156,6 +157,20 @@
         .signal-buy { color: #10b981; font-weight: 700; }
         .signal-sell { color: #ef4444; font-weight: 700; }
 
+        /* News Cards */
+        .news-item {
+            padding: 16px;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.2s;
+            cursor: pointer;
+            display: flex;
+            gap: 16px;
+        }
+        .news-item:hover { background: #f8fafc; }
+        .news-thumb { width: 80px; height: 60px; border-radius: 8px; object-fit: cover; background: #eee; }
+        .news-headline { font-weight: 600; font-size: 14px; margin-bottom: 4px; line-height: 1.4; color: var(--text-primary); }
+        .news-meta { font-size: 11px; color: var(--text-secondary); }
+
         /* List Items */
 
         @media (max-width: 1024px) {
@@ -184,7 +199,10 @@
         <div class="sidebar-item" onclick="switchTab('rebalancerTab', this)">
             <i class="fas fa-wand-magic-sparkles"></i> AI Rebalancer
         </div>
-        <div style="margin-top: auto; padding: 24px;">
+        <div style="margin-top: auto; padding: 24px; display: flex; flex-direction: column; gap: 12px;">
+            <button class="btn btn-primary" onclick="exportPortfolioPDF()" style="width:100%; font-size: 12px;">
+                <i class="fas fa-file-pdf"></i> Export Terminal Report
+            </button>
             <button class="btn btn-outline" onclick="logout()" style="width:100%; justify-content:center;">Logout</button>
         </div>
     </aside>
@@ -294,35 +312,24 @@
 
         <!-- Tab 2 -->
         <div id="marketTab" class="tab-content">
-            <div class="card reveal" style="height: 85vh; padding: 20px; display: flex; flex-direction: column;">
-                <div class="card-header">
-                    <h3>Live Trading Terminal</h3>
-                    <div class="ai-status">Vercel Streaming Active</div>
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; height: 85vh;">
+                <!-- Left: Charts -->
+                <div class="card" style="padding: 20px; display: flex; flex-direction: column;">
+                    <div class="card-header">
+                        <h3>Global Market Terminal</h3>
+                        <div class="ai-status">Real-Time WebSocket</div>
+                    </div>
+                    <div id="tradingview_widget" style="flex-grow: 1;"></div>
                 </div>
-                <div style="display: grid; grid-template-columns: 3fr 1fr; gap: 20px; flex-grow: 1;">
-                    <div id="tradingview_adv" style="height: 100%; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden;"></div>
-                    <div class="tradingview-widget-container" style="height: 100%; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden;">
-                        <div class="tradingview-widget-container__widget"></div>
-                        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
-                        {
-                            "colorTheme": "light",
-                            "dateRange": "12M",
-                            "showChart": true,
-                            "locale": "en",
-                            "width": "100%",
-                            "height": "100%",
-                            "tabs": [
-                                {
-                                    "title": "Markets",
-                                    "symbols": [
-                                        { "s": "FOREXCOM:SPXUSD", "d": "S&P 500" },
-                                        { "s": "INDEX:NIFTY", "d": "Nifty 50" },
-                                        { "s": "BINANCE:BTCUSDT", "d": "Bitcoin" }
-                                    ]
-                                }
-                            ]
-                        }
-                        </script>
+                
+                <!-- Right: News & Intelligence -->
+                <div class="card" style="padding: 0; display: flex; flex-direction: column; overflow: hidden;">
+                    <div class="card-header" style="padding: 20px;">
+                        <h3>Live Intelligence</h3>
+                        <span class="ai-status">Reuters / Bloomberg</span>
+                    </div>
+                    <div id="newsFeed" style="flex-grow: 1; overflow-y: auto;">
+                        <div style="text-align:center; padding:40px; color:#94a3b8;">Scanning global networks...</div>
                     </div>
                 </div>
             </div>
@@ -346,6 +353,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="supabase-client.js"></script>
 <script>
     let myHoldings = [];
@@ -360,6 +368,7 @@
         initCharts();
         fetchHoldings();
         fetchAIPredictions();
+        saveDailySnapshot();
     });
 
     async function fetchHoldings() {
@@ -428,7 +437,6 @@
                 document.getElementById('predictedCloseValue').textContent = '$' + d.predicted_next_close;
                 document.getElementById('predictedReturnValue').textContent = d.predicted_daily_return_pct + '%';
                 document.getElementById('aiRiskScoreValue').textContent = d.ai_risk_score;
-                document.getElementById('aiMessage').textContent = '✅ LSTM Model Update Complete.';
             }
         } catch (e) {}
     }
@@ -439,13 +447,13 @@
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         document.getElementById(tabId).classList.add('active');
         
-        if (tabId === 'marketTab') initTradingView();
+        if (tabId === 'marketTab') { initTradingView(); fetchNews(); }
         if (tabId === 'rebalancerTab') fetchRebalanceReport();
     }
 
     function initTradingView() {
         if (typeof TradingView !== 'undefined') {
-            new TradingView.widget({ "width": "100%", "height": "100%", "symbol": "NASDAQ:AAPL", "interval": "D", "theme": "light", "container_id": "tradingview_adv" });
+            new TradingView.widget({ "width": "100%", "height": "100%", "symbol": "NASDAQ:AAPL", "interval": "D", "theme": "light", "container_id": "tradingview_widget" });
         } else {
             const s = document.createElement('script'); s.src = "https://s3.tradingview.com/tv.js"; s.onload = initTradingView; document.head.appendChild(s);
         }
@@ -525,7 +533,6 @@
 
     async function setRiskProfile(profile) {
         currentProfile = profile;
-        // UI Update
         document.querySelectorAll('.risk-btn').forEach(b => b.classList.remove('active'));
         if(profile === 'Conservative') document.getElementById('risk-con').classList.add('active');
         if(profile === 'Moderate') document.getElementById('risk-mod').classList.add('active');
@@ -551,7 +558,6 @@
 
     function renderRebalanceReport(report) {
         const list = document.getElementById('rebalanceReportList');
-        // Simple logic: Compare target value to current holdings type (summary)
         const currentGroups = {};
         myHoldings.forEach(h => { currentGroups[h.asset_type] = (currentGroups[h.asset_type] || 0) + (h.live_value || 0); });
 
@@ -599,8 +605,80 @@
         }, 2000);
     }
 
-    // Add rebalancer button update to sidebar
-    // I need to update the switchTab to also trigger rebalance if active
+    // --- News & PDF Logic ---
+    async function fetchNews() {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/market-news`);
+            const data = await res.json();
+            renderNews(data.news || []);
+        } catch (e) { console.error('News fetch failed', e); }
+    }
+
+    function renderNews(news) {
+        const div = document.getElementById('newsFeed');
+        if (!news.length) { div.innerHTML = '<div style="padding:20px; text-align:center; color:#64748b;">No news headlines found.</div>'; return; }
+        
+        div.innerHTML = news.map(item => `
+            <div class="news-item" onclick="window.open('${item.url}', '_blank')">
+                <img class="news-thumb" src="${item.image || 'https://via.placeholder.com/80'}" onerror="this.src='https://via.placeholder.com/80'">
+                <div>
+                    <div class="news-headline">${item.headline}</div>
+                    <div class="news-meta">${item.source} • ${new Date(item.datetime * 1000).toLocaleTimeString()}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async function exportPortfolioPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        showToast('Generating Institutional Report...');
+        
+        // Header
+        doc.setFontSize(22);
+        doc.setTextColor(37, 99, 235);
+        doc.text('RAPOS: Terminal Report', 20, 20);
+        
+        doc.setFontSize(10);
+        doc.setTextColor(100, 116, 139);
+        doc.text(`Generated for: ${currentUser.email}`, 20, 28);
+        doc.text(`Date: ${new Date().toLocaleString()}`, 20, 34);
+        
+        // Summary
+        doc.setFontSize(16);
+        doc.setTextColor(15, 23, 42);
+        doc.text('Portfolio Summary', 20, 50);
+        
+        let y = 60;
+        doc.setFontSize(12);
+        myHoldings.forEach(h => {
+            doc.text(`${h.asset_name} (${h.ticker}): ${h.quantity} units - Value: $${(h.live_value || 0).toLocaleString()}`, 20, y);
+            y += 10;
+        });
+
+        doc.save(`RAPOS_Report_${new Date().getTime()}.pdf`);
+        showToast('✅ Report Downloaded!');
+    }
+
+    // --- History Logic ---
+    async function saveDailySnapshot() {
+        const total = myHoldings.reduce((sum, h) => sum + (h.live_value || 0), 0);
+        if (total === 0) return;
+        
+        const today = new Date().toISOString().split('T')[0];
+        try {
+            const { error } = await supabase.from('portfolio_history').upsert(
+                [{ user_id: currentUser.id, total_val: total, recorded_at: today }],
+                { onConflict: 'user_id, recorded_at' }
+            );
+            if (!error) console.log('Snapshot saved success.');
+        } catch (e) { /* Table might not exist yet */ }
+    }
+
+    function initCharts() {
+        allocationChart = new Chart(document.getElementById('allocationChart'), { type: 'doughnut', data: { labels: [], datasets: [{ data: [], backgroundColor: ['#2563eb', '#3b82f6', '#93c5fd'] }] }, options: { responsive:true, maintainAspectRatio:false }});
+    }
 </script>
 </body>
 </html>

@@ -229,6 +229,19 @@ def rebalance_portfolio(total_value: float, profile: str = "Moderate"):
         "advice": f"Optimization complete for {profile} profile. Adjust holdings to match target values."
     }
 
+# --- WEALTH HISTORY & NEWS ---
+
+@app.get("/api/market-news")
+def get_market_news(category: str = "general"):
+    """
+    Fetches latest market news from Finnhub.
+    """
+    try:
+        news = finnhub_client.general_news(category, min_id=0)
+        return {"news": news[:10]} # Top 10 headlines
+    except Exception as e:
+        return {"news": [], "error": str(e)}
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

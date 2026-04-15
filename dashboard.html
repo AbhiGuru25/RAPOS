@@ -104,7 +104,9 @@
 
         .ai-status { font-size: 11px; padding: 4px 12px; background: rgba(37, 99, 235, 0.1); color: var(--accent-primary); border-radius: 20px; font-weight: 700; }
 
-        /* Search Autocomplete */
+        .ai-status { font-size: 11px; padding: 4px 12px; background: rgba(37, 99, 235, 0.1); color: var(--accent-primary); border-radius: 20px; font-weight: 700; }
+
+        /* Search Autocomplete Overlay */
         .search-suggestions {
             position: absolute;
             top: 100%; left: 0; right: 0;
@@ -148,6 +150,9 @@
         <div class="sidebar-item" onclick="switchTab('marketTab', this)">
             <i class="fas fa-globe"></i> Market Hub
         </div>
+        <div class="sidebar-item" onclick="window.location.href='dashboard-classic.html'">
+            <i class="fas fa-history"></i> Classic View
+        </div>
         <div class="sidebar-item" onclick="showToast('AI Optimiser arrives in Beta next week!')">
             <i class="fas fa-wand-magic-sparkles"></i> AI Rebalancer
         </div>
@@ -168,7 +173,7 @@
             </div>
 
             <div class="grid-container">
-                <div class="card reveal">
+                <div class="card">
                     <div class="card-header"><h3>Portfolio Summary</h3></div>
                     <div class="stat-grid">
                         <div class="stat-item">
@@ -182,7 +187,7 @@
                     </div>
                 </div>
 
-                <div class="card reveal">
+                <div class="card">
                     <div class="card-header"><h3>Neural Prediction</h3></div>
                     <select id="tickerSelector" onchange="fetchAIPredictions(this.value)" style="width:100%; padding:12px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:16px;">
                         <option value="AAPL">Select Ticker: AAPL</option>
@@ -211,7 +216,7 @@
                     </div>
                 </div>
 
-                <div class="card reveal">
+                <div class="card">
                     <div class="card-header"><h3>Asset Allocation</h3></div>
                     <div style="height: 300px;"><canvas id="allocationChart"></canvas></div>
                 </div>

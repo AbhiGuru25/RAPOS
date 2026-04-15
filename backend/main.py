@@ -130,6 +130,14 @@ def predict_risk(ticker: str = 'SPXX'):
             "model_type": "LSTM Neural Network",
             "is_simulated": False
         }
+    except Exception as e:
+        # Extreme fallback
+        return {
+            "ticker": ticker, 
+            "ai_risk_score": 6.5, 
+            "is_simulated": True, 
+            "error": str(e)
+        }
 
 # --- REAL-TIME MARKET DATA ---
 

@@ -91,6 +91,10 @@ def predict_risk(ticker: str = 'SPXX'):
         return {
             "ticker": ticker,
             "ai_risk_score": 5.0,
+            "last_close_price": 150.0,
+            "predicted_next_close": 152.5,
+            "predicted_daily_return_pct": 1.6,
+            "historical_volatility_pct": 12.5,
             "is_simulated": True,
             "message": "Demo Mode: Using average risk baseline."
         }
@@ -134,7 +138,11 @@ def predict_risk(ticker: str = 'SPXX'):
         # Extreme fallback
         return {
             "ticker": ticker, 
-            "ai_risk_score": 6.5, 
+            "ai_risk_score": 6.5,
+            "last_close_price": 0.0,
+            "predicted_next_close": 0.0,
+            "predicted_daily_return_pct": 0.0,
+            "historical_volatility_pct": 0.0,
             "is_simulated": True, 
             "error": str(e)
         }

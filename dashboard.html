@@ -446,6 +446,13 @@
 
         saveDailySnapshot();
         fetchMarketDiscover();
+
+        // ≡ƒÜÇ 30-Second Network Heartbeat: Keep numbers live for Viva
+        setInterval(() => {
+            console.log("RAPOS: Heartbeat - Refreshing Market Data...");
+            fetchHoldings();
+            fetchMarketDiscover();
+        }, 30000);
     });
 
     async function fetchMarketDiscover() {
@@ -519,17 +526,31 @@
     }
 
     function updateStats() {
-        const total = myHoldings.reduce((sum, h) => sum + (h.live_value || 0), 0);
-        document.getElementById('portfolioValue').textContent = '$' + total.toLocaleString();
-        
-        // Calculate Weighted Daily Change
-        const avgChange = myHoldings.length > 0 
-            ? myHoldings.reduce((sum, h) => sum + (h.performance_pct || 0), 0) / myHoldings.length 
-            : 0;
+        let totalVal = 0;
+        let totalGainDollar = 0;
+        let totalPrevVal = 0;
+
+        myHoldings.forEach(h => {
+            const val = h.live_value || 0;
+            totalVal += val;
+            
+            // Calculate what this was worth yesterday
+            const pc = h.performance_pct || 0;
+            const prevPrice = (h.current_price || 0) / (1 + pc / 100);
+            const prevVal = (h.quantity || 1) * prevPrice;
+            totalPrevVal += prevVal;
+            totalGainDollar += (val - prevVal);
+        });
+
+        const velocity = totalPrevVal > 0 ? ((totalVal - totalPrevVal) / totalPrevVal) * 100 : 0;
+
+        document.getElementById('portfolioValue').textContent = '$' + totalVal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
         
         const changeEl = document.getElementById('portfolioDailyChange');
-        changeEl.textContent = `${avgChange >= 0 ? '+' : ''}${avgChange.toFixed(2)}% Today`;
-        changeEl.style.color = avgChange >= 0 ? '#10b981' : '#ef4444';
+        const sign = totalGainDollar >= 0 ? '+' : '';
+        changeEl.textContent = `${sign}$${totalGainDollar.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} (${sign}${velocity.toFixed(2)}%) Today`;
+        changeEl.style.color = totalGainDollar >= 0 ? '#10b981' : '#ef4444';
+        changeEl.style.fontWeight = '700';
 
         if (!allocationChart) return;
         const groups = {};

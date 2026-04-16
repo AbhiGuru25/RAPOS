@@ -394,7 +394,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="supabase-client.js"></script>
 <script>
-    const API_BASE_URL = 'https://rapos-backend.onrender.com';
+    const API_BASE_URL = 'https://rapos.onrender.com';
     let myHoldings = [];
     let allocationChart;
     let currentUser = null;
@@ -407,9 +407,16 @@
         
         initCharts();
         
+        // Safety Timer for Viva: Automatically hide loader after 8 seconds no matter what
+        const safetyTimer = setTimeout(() => {
+            document.getElementById('vivaLoader').classList.add('hidden');
+            console.log("RAPOS: Safety timer triggered.");
+        }, 8000);
+
         // Final Viva Load Flow
         try {
             await Promise.all([fetchHoldings(), fetchAIPredictions()]);
+            clearTimeout(safetyTimer); // Clear if success
             setTimeout(() => { document.getElementById('vivaLoader').classList.add('hidden'); }, 1000);
         } catch (e) {
             console.error('Wait failed, continuing...');

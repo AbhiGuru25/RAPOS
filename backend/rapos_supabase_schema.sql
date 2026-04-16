@@ -9,9 +9,10 @@ CREATE TABLE IF NOT EXISTS public.portfolios (
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
     asset_name TEXT NOT NULL,
     ticker TEXT NOT NULL,
+    quantity DECIMAL(12,4) DEFAULT 1.0, -- Added for live weighted tracking
     value DECIMAL(12,2) NOT NULL DEFAULT 0,
     performance_pct DECIMAL(5,2) DEFAULT 0,
-    asset_type TEXT,
+    asset_type TEXT DEFAULT 'Stocks',
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

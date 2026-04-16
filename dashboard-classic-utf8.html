@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -138,22 +138,6 @@
             transform: translateY(-4px);
             box-shadow: var(--shadow-sm);
         }
-
-        /* Search Autocomplete Overlay */
-        .search-suggestions {
-            position: absolute;
-            top: 100%; left: 0; right: 0;
-            background: white; border: 1px solid #e2e8f0; border-radius: 12px;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
-            z-index: 2000; max-height: 250px; overflow-y: auto; display: none;
-        }
-        .suggestion-item { 
-            padding: 12px 16px; cursor: pointer; display: flex; 
-            justify-content: space-between; border-bottom: 1px solid #f1f5f9; 
-            color: var(--text-primary); font-size: 14px;
-        }
-        .suggestion-item:hover { background: #f8fafc; }
-        .suggestion-item span:first-child { font-weight: 800; color: var(--accent-primary); }
     </style>
 </head>
 
@@ -595,10 +579,9 @@
     // Real Trade Modal & Savings logic
     function showTradeModal() {
         showModal('Add New Asset', `
-            <div style="position:relative; margin-bottom:15px;">
-                <label style="display:block; margin-bottom:8px; font-weight:600;">Asset Name / Ticker Search</label>
-                <input type="text" id="addAssetName" autocomplete="off" placeholder="e.g. Tesla, Apple..." style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd;">
-                <div id="searchSuggestions" class="search-suggestions"></div>
+            <div class="input-group" style="margin-bottom:15px;">
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Asset Name</label>
+                <input type="text" id="addAssetName" placeholder="e.g. Tesla Motors" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
             </div>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px;">
                 <div class="input-group">
@@ -620,45 +603,6 @@
                 <input type="number" id="addQuantity" placeholder="10.0" step="0.01" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
             </div>
         `, 'Add to Live Portfolio', saveAsset);
-        setupSearch();
-    }
-
-    // Autocomplete Logic
-    let searchT;
-    function setupSearch() {
-        const input = document.getElementById('addAssetName');
-        if (!input) return;
-        input.addEventListener('input', (e) => {
-            clearTimeout(searchT);
-            const q = e.target.value;
-            if (q.length < 2) { hideS(); return; }
-            searchT = setTimeout(async () => {
-                try {
-                    const res = await fetch(`${API_BASE_URL}/api/search-stocks?q=${q}`);
-                    const data = await res.json();
-                    renderS(data.results || []);
-                } catch (e) { console.error('Search failed', e); }
-            }, 300);
-        });
-    }
-
-    function renderS(res) {
-        const div = document.getElementById('searchSuggestions');
-        if (!div) return;
-        div.innerHTML = res.map(i => `
-            <div class="suggestion-item" onclick="sel('${i.symbol}','${i.description}')">
-                <span>${i.symbol}</span>
-                <span>${i.description}</span>
-            </div>
-        `).join('');
-        div.style.display = 'block';
-    }
-
-    function hideS() { const d = document.getElementById('searchSuggestions'); if(d) d.style.display = 'none'; }
-    function sel(s,d) { 
-        document.getElementById('addTicker').value = s; 
-        document.getElementById('addAssetName').value = d; 
-        hideS(); 
     }
 
     async function saveAsset() {

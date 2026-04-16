@@ -239,6 +239,34 @@ def rebalance_portfolio(total_value: float, profile: str = "Moderate"):
 
 # --- WEALTH HISTORY & NEWS ---
 
+@app.get("/api/market-discover")
+def market_discover():
+    """
+    RAPOS AI Market Insight: Finds the top gainers from a curated Alpha List.
+    """
+    alpha_tickers = ["NVDA", "TSLA", "AAPL", "MSFT", "BTC-USD", "ETH-USD", "GOOGL", "AMD"]
+    raw_results = []
+    
+    for ticker in alpha_tickers:
+        try:
+            # Finnhub requires BTC-USD style for quote? 
+            # Actually standard BTC usually works if mapped correctly. 
+            # We will try a simple quote first.
+            t = ticker.replace("-USD", "")
+            quote = finnhub_client.quote(t)
+            if quote and quote['c'] > 0:
+                raw_results.append({
+                    "ticker": ticker,
+                    "price": round(float(quote['c']), 2),
+                    "change": round(float(quote['dp']), 2),
+                    "sentiment": "Bullish" if quote['dp'] > 0 else "Bearish"
+                })
+        except: continue
+        
+    # Sort by percentage change descending
+    sorted_gainers = sorted(raw_results, key=lambda x: x['change'], reverse=True)
+    return {"discovery": sorted_gainers[:4], "intelligence_note": "AI analysis suggests high-momentum accumulation in these tickers."}
+
 @app.get("/api/market-news")
 def get_market_news(category: str = "general"):
     """

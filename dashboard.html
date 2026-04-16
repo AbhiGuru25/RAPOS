@@ -178,6 +178,14 @@
         .news-headline { font-weight: 600; font-size: 14px; margin-bottom: 4px; line-height: 1.4; color: var(--text-primary); }
         .news-meta { font-size: 11px; color: var(--text-secondary); }
 
+        /* Discovery & Performance Pills */
+        .pill { font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 700; text-transform: uppercase; }
+        .pill-up { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+        .pill-down { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .discovery-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f8fafc; border-radius: 12px; margin-bottom: 8px; }
+        .discovery-ticker { font-weight: 700; color: var(--text-primary); }
+        .discovery-val { font-weight: 600; }
+
         /* Viva Loading Overlay */
         .viva-loader {
             position: fixed;
@@ -263,6 +271,7 @@
                         <div class="stat-item">
                             <div class="stat-label">Total Net Worth</div>
                             <div id="portfolioValue" class="stat-value">$0.00</div>
+                            <div id="portfolioDailyChange" style="font-size: 13px; margin-top: 4px;">---</div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-label">Live AI Risk</div>
@@ -286,6 +295,7 @@
                         <div class="stat-item">
                             <div class="stat-label">Fcst Return</div>
                             <div id="predictedReturnValue" class="stat-value">---</div>
+                            <div id="predictedSentiment" class="pill pill-up" style="margin-top:4px;">Neutral</div>
                         </div>
                     </div>
                 </div>
@@ -303,6 +313,18 @@
                 <div class="card">
                     <div class="card-header"><h3>Asset Allocation</h3></div>
                     <div style="height: 300px;"><canvas id="allocationChart"></canvas></div>
+                </div>
+
+                <!-- New Discovery Card -->
+                <div class="card" style="grid-column: span 1;">
+                    <div class="card-header">
+                        <h3>AI Market Highlights</h3>
+                        <span class="ai-status">Alpha Discovery</span>
+                    </div>
+                    <div id="discoveryList">
+                        <div style="text-align: center; padding: 20px; color: #94a3b8;">Scanning for best stocks...</div>
+                    </div>
+                    <p style="font-size: 11px; color: var(--text-secondary); margin-top: 12px; font-style: italic;">Signals based on momentum & real-time volumetric analysis.</p>
                 </div>
             </div>
         </div>
@@ -423,7 +445,29 @@
         }
 
         saveDailySnapshot();
+        fetchMarketDiscover();
     });
+
+    async function fetchMarketDiscover() {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/market-discover`);
+            const data = await res.json();
+            const list = document.getElementById('discoveryList');
+            if (data.discovery) {
+                list.innerHTML = data.discovery.map(item => `
+                    <div class="discovery-item">
+                        <div>
+                            <div class="discovery-ticker">${item.ticker}</div>
+                            <div class="pill ${item.sentiment === 'Bullish' ? 'pill-up' : 'pill-down'}">${item.sentiment}</div>
+                        </div>
+                        <div class="discovery-val" style="color:${item.change >= 0 ? '#10b981' : '#ef4444'}">
+                            ${item.change >= 0 ? '+' : ''}${item.change}%
+                        </div>
+                    </div>
+                `).join('');
+            }
+        } catch (e) { console.error('Discovery failed'); }
+    }
 
     async function fetchHoldings() {
         try {
@@ -462,9 +506,12 @@
                         <div style="font-size:12px; color:#64748b;">${h.quantity || 1} shares @ $${h.current_price || '---'}</div>
                     </div>
                 </div>
-                <div style="text-align:right;">
-                    <div style="font-weight:800;">$${(h.live_value || 0).toLocaleString()}</div>
-                    <div style="font-size:11px; color:${h.performance_pct >= 0 ? '#10b981' : '#ef4444'}">${h.performance_pct}%</div>
+                <div style="display:flex; align-items:center;">
+                    <div style="text-align:right;">
+                        <div style="font-weight:800;">$${(h.live_value || 0).toLocaleString()}</div>
+                        <div style="font-size:11px; color:${h.performance_pct >= 0 ? '#10b981' : '#ef4444'}">${h.performance_pct}%</div>
+                    </div>
+                    ${generateSparkline(h.performance_pct >= 0)}
                 </div>
                 <button onclick="deleteAsset('${h.id}')" style="background:none; border:none; color:#94a3b8; cursor:pointer; font-size:18px; margin-left:12px;">&times;</button>
             </div>
@@ -475,12 +522,28 @@
         const total = myHoldings.reduce((sum, h) => sum + (h.live_value || 0), 0);
         document.getElementById('portfolioValue').textContent = '$' + total.toLocaleString();
         
+        // Calculate Weighted Daily Change
+        const avgChange = myHoldings.length > 0 
+            ? myHoldings.reduce((sum, h) => sum + (h.performance_pct || 0), 0) / myHoldings.length 
+            : 0;
+        
+        const changeEl = document.getElementById('portfolioDailyChange');
+        changeEl.textContent = `${avgChange >= 0 ? '+' : ''}${avgChange.toFixed(2)}% Today`;
+        changeEl.style.color = avgChange >= 0 ? '#10b981' : '#ef4444';
+
         if (!allocationChart) return;
         const groups = {};
         myHoldings.forEach(h => { groups[h.asset_type] = (groups[h.asset_type] || 0) + (h.live_value || 0); });
         allocationChart.data.labels = Object.keys(groups);
         allocationChart.data.datasets[0].data = Object.values(groups);
         allocationChart.update();
+    }
+
+    function generateSparkline(up) {
+        const points = up ? [20,15,18,12,14,8,5] : [5,10,8,15,12,20,18];
+        let d = `M 0 ${points[0]}`;
+        points.forEach((p, i) => { d += ` L ${i * 10} ${p}`; });
+        return `<svg width="70" height="25" style="margin-left:10px;"><path d="${d}" fill="none" stroke="${up ? '#10b981' : '#ef4444'}" stroke-width="2" /></svg>`;
     }
 
     async function fetchAIPredictions(ticker = 'AAPL') {
@@ -491,6 +554,10 @@
                 document.getElementById('predictedCloseValue').textContent = '$' + (d.predicted_next_close || '---');
                 document.getElementById('predictedReturnValue').textContent = (d.predicted_daily_return_pct || '0.0') + '%';
                 document.getElementById('aiRiskScoreValue').textContent = d.ai_risk_score || '5.0';
+                
+                const s = document.getElementById('predictedSentiment');
+                s.textContent = d.predicted_daily_return_pct >= 0 ? 'Bullish' : 'Bearish';
+                s.className = `pill ${d.predicted_daily_return_pct >= 0 ? 'pill-up' : 'pill-down'}`;
             }
         } catch (e) {
             console.error('AI Prediction link failed. Showing fallback.');

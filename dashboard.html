@@ -68,9 +68,10 @@
         .main-content {
             flex-grow: 1;
             margin-left: 260px;
-            padding: 40px;
+            padding: 0 40px 40px 40px;
             width: calc(100% - 260px);
             box-sizing: border-box;
+            background: #f8fafc;
         }
 
         .tab-content { display: none; }
@@ -80,15 +81,19 @@
         .welcome-banner {
             background: var(--accent-gradient);
             color: white;
-            padding: 32px;
-            border-radius: 20px;
+            padding: 24px 32px;
+            border-radius: 0 0 24px 24px;
             margin-bottom: 32px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: sticky;
+            top: 36px;
+            z-index: 1000;
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2);
         }
 
-        .welcome-banner h1 { margin: 0; color: white; font-size: 28px; }
+        .welcome-banner h1 { margin: 0; color: white; font-size: 24px; }
 
         .grid-container {
             display: grid;
@@ -224,9 +229,14 @@
         .ticker-wrap {
             width: 100%;
             overflow: hidden;
-            background: #1e293b;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             padding: 8px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 1001;
         }
         .ticker {
             display: flex;
@@ -307,9 +317,9 @@
 
     <main class="main-content">
         <!-- Institutional Ticker -->
-        <div class="ticker-wrap" style="background:#f8fafc; border-bottom:1px solid #e2e8f0; margin-bottom:0;">
+        <div class="ticker-wrap" style="margin-left: -40px; width: calc(100% + 80px);">
             <div class="ticker">
-                <div class="ticker-item"><span>BTC/USD</span> <span class="ticker-up">$64,321 (+1.2%)</span></div>
+                <div class="ticker-item" style="color:var(--text-secondary);"><span>BTC/USD</span> <span class="ticker-up">$64,321 (+1.2%)</span></div>
                 <div class="ticker-item"><span>NVDA</span> <span class="ticker-up">$854.12 (+2.4%)</span></div>
                 <div class="ticker-item"><span>TSLA</span> <span class="ticker-down">$175.22 (-0.8%)</span></div>
                 <div class="ticker-item"><span>AAPL</span> <span class="ticker-up">$189.44 (+0.4%)</span></div>

@@ -92,8 +92,9 @@
 
         .grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 32px;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 28px;
+            align-items: start;
         }
 
         .card {
@@ -448,6 +449,17 @@
         fetchMarketDiscover();
 
         // ≡ƒÜÇ 30-Second Network Heartbeat: Keep numbers live for Viva
+        // --- Reveal Engine: Makes sections fade in smoothly for a premium feel ---
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
         setInterval(() => {
             console.log("RAPOS: Heartbeat - Refreshing Market Data...");
             fetchHoldings();

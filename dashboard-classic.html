@@ -424,7 +424,9 @@
                     <div>
                         <div class="portfolio-item-value">$${(asset.live_value || asset.value).toLocaleString()}</div>
                         <span class="badge ${asset.performance_pct >= 0 ? 'positive' : 'negative'}">
-                            ${asset.is_live ? 'LIVE ' : ''}${asset.performance_pct >= 0 ? 'Γåæ' : 'Γåô'} ${Math.abs(asset.performance_pct)}%
+                            ${asset.is_live ? 'LIVE ' : ''}
+                            <i class="fas fa-caret-${asset.performance_pct >= 0 ? 'up' : 'down'}"></i> 
+                            ${Math.abs(asset.performance_pct)}%
                         </span>
                     </div>
                     <button class="modal-close" onclick="event.stopPropagation(); deleteAsset('${asset.id}')" style="position: static; font-size: 18px; color: var(--danger); opacity: 0.5 hover:opacity: 1;">&times;</button>

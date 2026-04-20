@@ -154,10 +154,57 @@
         }
         .suggestion-item:hover { background: #f8fafc; }
         .suggestion-item span:first-child { font-weight: 800; color: var(--accent-primary); }
+        /* Custom Ticker Styles for Classic */
+        .ticker-wrap {
+            width: 100%;
+            overflow: hidden;
+            background: #0f172a;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .ticker {
+            display: flex;
+            white-space: nowrap;
+            animation: ticker 30s linear infinite;
+        }
+        .ticker-item {
+            color: #cbd5e1;
+            padding: 0 40px;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .ticker-up { color: #10b981; }
+        .ticker-down { color: #ef4444; }
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
     </style>
 </head>
 
-<body>
+<body class="dashboard-body">
+
+    <!-- Institutional Ticker -->
+    <div class="ticker-wrap">
+        <div class="ticker">
+            <div class="ticker-item"><span>BTC/USD</span> <span class="ticker-up">$64,321 (+1.2%)</span></div>
+            <div class="ticker-item"><span>NVDA</span> <span class="ticker-up">$854.12 (+2.4%)</span></div>
+            <div class="ticker-item"><span>TSLA</span> <span class="ticker-down">$175.22 (-0.8%)</span></div>
+            <div class="ticker-item"><span>AAPL</span> <span class="ticker-up">$189.44 (+0.4%)</span></div>
+            <div class="ticker-item"><span>GOLD</span> <span class="ticker-up">$2,342 (+1.1%)</span></div>
+            <!-- Duplicate for seamless loop -->
+            <div class="ticker-item"><span>BTC/USD</span> <span class="ticker-up">$64,321 (+1.2%)</span></div>
+            <div class="ticker-item"><span>NVDA</span> <span class="ticker-up">$854.12 (+2.4%)</span></div>
+            <div class="ticker-item"><span>TSLA</span> <span class="ticker-down">$175.22 (-0.8%)</span></div>
+            <div class="ticker-item"><span>AAPL</span> <span class="ticker-up">$189.44 (+0.4%)</span></div>
+            <div class="ticker-item"><span>GOLD</span> <span class="ticker-up">$2,342 (+1.1%)</span></div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
 <!-- Notification Toast -->
 <div id="toast" style="position:fixed;top:30px;right:30px;z-index:9999;min-width:260px;padding:16px 24px;background:var(--text-primary);color:white;border-radius:12px;box-shadow:var(--shadow-lg);font-size:15px;font-weight:500;display:none;align-items:center;justify-content:space-between;transition:opacity 0.3s;">
     <span id="toastMsg"></span>
@@ -346,11 +393,19 @@
         // ≡ƒÜÇ Fetch real cloud-saved holdings
         fetchHoldings();
 
-        // ≡ƒÜÇ 60-Second Refresh Heartbeat
+        // --- Real-time Pulse: Refresh every 10 seconds for Viva ---
         setInterval(() => {
-            console.log("RAPOS Classic: Refreshing Terminal Data...");
+            console.log("RAPOS: Classic High-Frequency Heartbeat...");
             fetchHoldings();
-        }, 60000);
+        }, 10000);
+
+        // --- Supabase Realtime: Instant sync across all tabs ---
+        supabase.channel('classic-updates')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'portfolios' }, (payload) => {
+            console.log('RAPOS Classic: Cloud Event Detected!', payload);
+            fetchHoldings();
+        })
+        .subscribe();
     });
 
     async function fetchHoldings() {

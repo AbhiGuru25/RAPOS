@@ -89,76 +89,78 @@
 
         <!-- Portfolio Tab -->
         <div id="portfolioTab" class="tab-view active">
-            <header style="margin-bottom: 40px; display:flex; justify-content:space-between; align-items:flex-end;">
+            <header style="margin-bottom: 48px; display:flex; justify-content:space-between; align-items:flex-end;">
                 <div>
-                    <h2 class="font-heading" style="font-size: 32px; margin-bottom: 8px;">Hi, <span id="userName">Investor</span></h2>
-                    <p style="color: var(--slate-500);">AI Node is currently processing <span id="assetCount">0</span> holdings.</p>
+                    <h2 class="text-gradient" style="font-size: 40px; margin-bottom: 8px;">Neural Terminal v3.0</h2>
+                    <p style="color: var(--slate-400); font-weight: 500;">Operator: <span id="userName" style="color:white; font-weight:700;">---</span> | Network Status: <span style="color:var(--success); font-weight:700;">OPTIMAL</span></p>
                 </div>
-                <button class="btn btn-primary" onclick="showTradeModal()">
-                    <i class="fas fa-plus"></i> New Investment
-                </button>
+                <div style="display:flex; gap:12px;">
+                    <button class="btn btn-secondary" onclick="exportPortfolioPDF()"><i class="fas fa-file-export"></i></button>
+                    <button class="btn btn-primary" onclick="showTradeModal()"><i class="fas fa-plus"></i> Initialize Node</button>
+                </div>
             </header>
 
-            <div style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px;">
-                <!-- Summary Card -->
-                <div class="card" style="grid-column: span 8;">
-                    <div class="card-title">
-                        <i class="fas fa-wallet" style="color:var(--brand-primary);"></i>
-                        Intelligence Summary
-                    </div>
-                    <div class="stat-group">
-                        <div class="stat-card">
-                            <div class="stat-label">Total Asset Value</div>
-                            <div id="portfolioValue" class="stat-value">$0.00</div>
-                            <div id="portfolioDailyChange" class="stat-trend">---</div>
+            <div style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; margin-bottom: 100px;">
+                <!-- Holographic Summary -->
+                <div class="card shimmer-box" style="grid-column: span 8; background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.8) 100%);">
+                    <div class="card-title" style="color: var(--brand-primary);"><i class="fas fa-microchip"></i> Intelligence Core Summary</div>
+                    <div class="stat-group" style="gap: 48px;">
+                        <div class="stat-card" style="background:transparent; padding:0; border:none;">
+                            <div class="stat-label">Total Volume Managed</div>
+                            <div id="portfolioValue" class="stat-value" style="font-size:48px; letter-spacing:-2px;">$0.00</div>
+                            <div id="portfolioDailyChange" class="stat-trend" style="font-size:16px;">---</div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Live Risk Score</div>
-                            <div id="aiRiskScoreValue" class="stat-value">---</div>
-                            <div class="stat-trend" style="color:var(--slate-400);">Neural Assessment</div>
+                        <div class="stat-card" style="background:transparent; padding:0; border:none;">
+                            <div class="stat-label">Neural Risk Index</div>
+                            <div id="aiRiskScoreValue" class="stat-value" style="font-size:48px; letter-spacing:-2px;">---</div>
+                            <div class="stat-trend" style="color:var(--brand-secondary);">QUANTIZED</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Prediction Card -->
-                <div class="card" style="grid-column: span 4;">
-                    <div class="card-title">
-                        <i class="fas fa-brain" style="color:var(--brand-secondary);"></i>
-                        Next-Close Fcst
-                    </div>
-                    <select id="tickerSelector" onchange="fetchAIPredictions(this.value)" style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--slate-200); background:var(--slate-50); font-weight:600; margin-bottom:16px;">
-                        <option value="AAPL">Select: Apple (AAPL)</option>
-                        <option value="TSLA">Select: Tesla (TSLA)</option>
-                        <option value="BTC">Bitcoin (BTC)</option>
+                <!-- Prediction Node -->
+                <div class="card" style="grid-column: span 4; border-color: rgba(139, 92, 246, 0.3);">
+                    <div class="card-title" style="color: var(--brand-secondary);"><i class="fas fa-wand-magic-sparkles"></i> AI Forecasting</div>
+                    <select id="tickerSelector" onchange="fetchAIPredictions(this.value)" class="input-field" style="margin-bottom:20px;">
+                        <option value="AAPL">AAPL (Apple Inc)</option>
+                        <option value="TSLA">TSLA (Tesla Motors)</option>
+                        <option value="BTC">BTC (Bitcoin)</option>
                     </select>
-                    <div style="padding: 16px; background: var(--slate-50); border-radius: 16px; border: 1px solid var(--slate-200);">
-                        <div id="predictedCloseValue" style="font-size: 24px; font-weight: 800; color: var(--brand-primary); margin-bottom: 4px;">$---</div>
+                    <div style="padding: 24px; background: rgba(0,0,0,0.2); border-radius: 18px; border: 1px solid var(--border-glass);">
+                        <div style="font-size:11px; color:var(--slate-500); font-weight:800; text-transform:uppercase; margin-bottom:8px;">Predicted Alpha</div>
+                        <div id="predictedCloseValue" style="font-size: 32px; font-weight: 900; color: white; margin-bottom: 8px;">$---</div>
                         <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span style="font-size:12px; color:var(--slate-500); font-weight:600;">Confidence: <span id="modelConfidence">--%</span></span>
-                            <div id="predictedSentiment" class="stat-trend" style="padding:2px 8px; border-radius:6px; font-size:11px; text-transform:uppercase;">---</div>
+                            <span style="font-size:12px; color:var(--slate-400);">Confidence: <span id="modelConfidence" style="color:var(--brand-primary);">--%</span></span>
+                            <div id="predictedSentiment" class="stat-trend" style="background:rgba(255,255,255,0.05); padding:4px 10px; border-radius:8px;">---</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Holdings List -->
-                <div class="card" style="grid-column: span 12;">
-                    <div class="card-title">Active Portfolio Weights</div>
+                <!-- Assets List -->
+                <div class="card" style="grid-column: span 7;">
+                    <div class="card-title"><i class="fas fa-database"></i> Initialized Nodes</div>
                     <div id="holdingsList" class="list-container">
-                        <div style="text-align: center; padding: 60px; color: var(--slate-400);">Initializing secure node...</div>
+                        <!-- Items injected by RAPOS_UI -->
                     </div>
                 </div>
 
-                <!-- Visuals -->
-                <div class="card" style="grid-column: span 6;">
-                    <div class="card-title">Asset Allocation</div>
-                    <div class="chart-container"><canvas id="allocationChart"></canvas></div>
-                </div>
-
-                <div class="card" style="grid-column: span 6;">
-                    <div class="card-title">Market Alpha Discovery</div>
+                <!-- Discovery -->
+                <div class="card" style="grid-column: span 5;">
+                    <div class="card-title"><i class="fas fa-radar"></i> Alpha Discovery Feed</div>
                     <div id="discoveryList" class="list-container">
-                        <div style="text-align: center; padding: 40px; color: var(--slate-400);">Scanning volumetric data...</div>
+                        <!-- Items injected by RAPOS_UI -->
                     </div>
+                </div>
+            </div>
+
+            <!-- Gen AI Command Bar -->
+            <div style="position: fixed; bottom: 32px; left: 320px; right: 40px; z-index: 500;">
+                <div style="max-width: 1000px; margin: 0 auto; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 12px; display: flex; gap: 12px; box-shadow: var(--shadow-float), 0 0 40px rgba(0,0,0,0.4);">
+                    <div style="width: 48px; height: 48px; background: var(--brand-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">
+                        <i class="fas fa-sparkles"></i>
+                    </div>
+                    <input type="text" placeholder="Ask RAPOS to rebalance, analyze a ticker, or generate a report..." style="flex: 1; background: transparent; border: none; outline: none; color: white; font-size: 16px; font-weight: 500;">
+                    <button class="btn btn-primary" style="padding: 0 24px;">Send</button>
                 </div>
             </div>
         </div>

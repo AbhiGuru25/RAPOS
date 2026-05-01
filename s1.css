@@ -6,14 +6,7 @@
     --brand-secondary: #6366f1;
     --brand-gradient: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
     
-    /* Semantic Colors */
-    --success: #10b981;
-    --success-bg: rgba(16, 185, 129, 0.1);
-    --danger: #ef4444;
-    --danger-bg: rgba(239, 68, 68, 0.1);
-    --warning: #f59e0b;
-    
-    /* Neutral Palette - Premium Slate */
+    /* Gen AI Midnight Palette */
     --slate-50: #f8fafc;
     --slate-100: #f1f5f9;
     --slate-200: #e2e8f0;
@@ -24,38 +17,59 @@
     --slate-700: #334155;
     --slate-800: #1e293b;
     --slate-900: #0f172a;
+    --slate-950: #020617; /* Deepest black */
+
+    /* AI Accents */
+    --brand-primary: #06b6d4; /* Electric Cyan */
+    --brand-secondary: #8b5cf6; /* Vibrant Purple */
+    --brand-glow: rgba(6, 182, 212, 0.15);
     
-    /* Glassmorphism Tokens */
-    --glass-bg: rgba(255, 255, 255, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.5);
-    --glass-blur: blur(12px);
-    
-    /* Shadows */
-    --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    --shadow-float: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    --shadow-inset: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+
+    /* Surfaces */
+    --bg-main: var(--slate-950);
+    --bg-surface: #0f172a;
+    --bg-glass: rgba(15, 23, 42, 0.6);
+    --border-glass: rgba(255, 255, 255, 0.08);
+
+    /* Shadows & Glows */
+    --shadow-soft: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+    --shadow-float: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
+    --glow-primary: 0 0 20px rgba(6, 182, 212, 0.3);
+
+    /* Animation Timings */
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Global Resets */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
 }
 
 body {
     font-family: 'Inter', sans-serif;
-    background-color: var(--slate-50);
-    color: var(--slate-900);
+    background-color: var(--bg-main);
+    color: var(--slate-300);
     line-height: 1.5;
     overflow-x: hidden;
 }
 
 h1, h2, h3, h4, .font-heading {
     font-family: 'Outfit', sans-serif;
-    font-weight: 700;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -0.02em;
+}
+
+/* AI Gradient Text */
+.text-gradient {
+    background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 /* --- Layout --- */
@@ -208,41 +222,61 @@ h1, h2, h3, h4, .font-heading {
 .trend-up { color: var(--success); }
 .trend-down { color: var(--danger); }
 
-/* Buttons */
+/* --- Interactive Elements --- */
 .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 10px 20px;
-    border-radius: 12px;
-    font-weight: 600;
+    gap: 10px;
+    padding: 12px 24px;
+    border-radius: 14px;
+    font-weight: 700;
     font-size: 14px;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
-    border: none;
+    transition: all 0.3s var(--ease-out);
+    border: 1px solid transparent;
 }
 
 .btn-primary {
-    background: var(--brand-gradient);
+    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
     color: white;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 8px 16px -4px rgba(6, 182, 212, 0.3);
 }
 
 .btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px -6px rgba(6, 182, 212, 0.5), var(--glow-primary);
 }
 
 .btn-secondary {
-    background: white;
-    color: var(--slate-700);
-    border: 1px solid var(--slate-200);
+    background: rgba(255,255,255,0.03);
+    color: white;
+    border: 1px solid var(--border-glass);
 }
 
 .btn-secondary:hover {
-    background: var(--slate-50);
-    border-color: var(--slate-300);
+    background: rgba(255,255,255,0.06);
+    border-color: var(--slate-500);
+}
+
+/* --- Form Elements --- */
+.input-field {
+    width: 100%;
+    padding: 14px 18px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border-glass);
+    border-radius: 14px;
+    color: white;
+    font-family: inherit;
+    font-size: 15px;
+    transition: all 0.2s var(--ease-out);
+}
+
+.input-field:focus {
+    outline: none;
+    background: rgba(255,255,255,0.05);
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.1);
 }
 
 /* Animations */

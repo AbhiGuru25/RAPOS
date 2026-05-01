@@ -236,19 +236,42 @@
     let currentProfile = 'Moderate';
 
     document.addEventListener("DOMContentLoaded", async function() {
-        const { data: { session } } = await RAPOS_API.getSession();
-        if (!session) { window.location.href = 'login.html'; return; }
+        console.log("RAPOS: Terminal Wake Sequence Initiated...");
         
-        // Initialize UI with user context
-        RAPOS_UI.init(session.user);
-        document.getElementById('userName').textContent = (session.user.user_metadata.full_name || 'Investor').split(' ')[0];
+        // Hard Safety Timeout: Hide loader after 5 seconds regardless of state
+        const safetyTimeout = setTimeout(() => {
+            const loader = document.getElementById('vivaLoader');
+            if (loader && loader.style.display !== 'none') {
+                console.warn("RAPOS: Hard timeout triggered. Forcing wake.");
+                loader.style.display = 'none';
+            }
+        }, 5000);
 
-        // Initial Data Load
         try {
+            const { data: { session } } = await RAPOS_API.getSession();
+            if (!session) { 
+                console.warn("RAPOS: No session detected. Redirecting...");
+                window.location.href = 'login.html'; 
+                return; 
+            }
+            
+            console.log("RAPOS: Session verified for", session.user.email);
+            
+            // Initialize UI with user context
+            RAPOS_UI.init(session.user);
+            document.getElementById('userName').textContent = (session.user.user_metadata.full_name || 'Investor').split(' ')[0];
+
+            // Initial Data Load
+            console.log("RAPOS: Syncing cloud data...");
             await syncTerminalData();
-            setTimeout(() => { document.getElementById('vivaLoader').style.display = 'none'; }, 1200);
+            
+            clearTimeout(safetyTimeout);
+            console.log("RAPOS: Data synced. Terminal ready.");
+            setTimeout(() => { document.getElementById('vivaLoader').style.display = 'none'; }, 800);
+            
         } catch (e) {
-            console.error("Terminal initialization failure", e);
+            console.error("RAPOS: Terminal initialization failure", e);
+            clearTimeout(safetyTimeout);
             document.getElementById('vivaLoader').style.display = 'none';
         }
 

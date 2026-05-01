@@ -3,170 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up | RAPOS Terminal</title>
+    <title>RAPOS | Initialize Neural Node</title>
     <link rel="stylesheet" href="s1.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            background: radial-gradient(circle at top right, #f8fafc 0%, #e2e8f0 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 40px 20px;
-        }
-
-        .auth-surface {
-            width: 100%;
-            max-width: 540px;
-            padding: 48px;
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            border-radius: 32px;
-            box-shadow: var(--shadow-float);
-            animation: authIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes authIn {
-            from { opacity: 0; transform: translateY(20px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 14px 16px;
-            background: white;
-            border: 1px solid var(--slate-200);
-            border-radius: 12px;
-            font-family: 'Inter', sans-serif;
-            font-size: 15px;
-            color: var(--slate-900);
-            transition: all 0.2s ease;
-            margin-bottom: 20px;
-        }
-
-        .input-field:focus {
-            outline: none;
-            border-color: var(--brand-primary);
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-        }
-
-        #errorMsg {
-            background: var(--success-bg);
-            color: var(--success);
-            padding: 12px;
-            border-radius: 12px;
-            margin-bottom: 24px;
-            font-size: 13px;
-            font-weight: 600;
-            display: none;
-            text-align: center;
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-        
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-        
-        @media (max-width: 500px) {
-            .form-grid { grid-template-columns: 1fr; }
-        }
-    </style>
 </head>
-<body>
+<body style="background: #020617; display: flex; align-items: center; justify-content: center; min-height: 100vh;">
 
-<div class="auth-surface">
-    <div style="text-align: center; margin-bottom: 40px;">
-        <div class="sidebar-logo" style="padding: 0; margin-bottom: 12px; font-size: 32px;">RAPOS</div>
-        <p style="color: var(--slate-500); font-weight: 500;">Initialize New Intelligence Node</p>
-    </div>
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 70%); z-index: -1;"></div>
 
-    <div id="errorMsg">Node successfully registered to network.</div>
-
-    <form id="signupForm" onsubmit="event.preventDefault(); handleSignup();">
-        <div class="form-grid">
-            <div>
-                <div style="margin-bottom: 8px; font-size: 11px; font-weight: 700; color: var(--slate-400); text-transform: uppercase;">Operator First Name</div>
-                <input type="text" id="firstName" class="input-field" placeholder="John" required>
-            </div>
-            <div>
-                <div style="margin-bottom: 8px; font-size: 11px; font-weight: 700; color: var(--slate-400); text-transform: uppercase;">Operator Last Name</div>
-                <input type="text" id="lastName" class="input-field" placeholder="Doe" required>
-            </div>
+    <div class="card" style="width: 100%; max-width: 480px; padding: 56px; border-radius: 40px; box-shadow: 0 40px 80px -20px rgba(0,0,0,0.8);">
+        <div style="text-align: center; margin-bottom: 48px;">
+            <div class="sidebar-logo" style="padding: 0; margin-bottom: 24px; font-size: 40px; display: inline-block;">RAPOS</div>
+            <h2 style="font-size: 24px; margin-bottom: 12px;">Initialize New Node</h2>
+            <p style="color: var(--slate-400); font-weight: 500;">Begin your institutional-grade journey.</p>
         </div>
 
-        <div style="margin-bottom: 8px; font-size: 11px; font-weight: 700; color: var(--slate-400); text-transform: uppercase;">Identity (Email)</div>
-        <input type="email" id="email" class="input-field" placeholder="operator@rapos.cloud" required>
+        <form id="signupForm" style="display: flex; flex-direction: column; gap: 24px;">
+            <div>
+                <div class="stat-label">Full Operator Name</div>
+                <input id="fullName" type="text" class="input-field" placeholder="Operator Name" required>
+            </div>
+            <div>
+                <div class="stat-label">Neural Identity (Email)</div>
+                <input id="email" type="email" class="input-field" placeholder="operator@rapos.ai" required>
+            </div>
+            <div>
+                <div class="stat-label">Security Protocol (Password)</div>
+                <input id="password" type="password" class="input-field" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 18px; margin-top: 12px;">
+                Initialize Protocol
+            </button>
+        </form>
 
-        <div style="margin-bottom: 8px; font-size: 11px; font-weight: 700; color: var(--slate-400); text-transform: uppercase;">Access Key (Password)</div>
-        <input type="password" id="password" class="input-field" placeholder="Create strong access key" required>
-
-        <div style="margin-bottom: 8px; font-size: 11px; font-weight: 700; color: var(--slate-400); text-transform: uppercase;">Operational Experience</div>
-        <select id="experience" class="input-field" required>
-            <option value="" disabled selected>Select level</option>
-            <option value="beginner">Retail / Beginner</option>
-            <option value="intermediate">Active Trader</option>
-            <option value="advanced">Institutional / Quants</option>
-        </select>
-
-        <p style="font-size: 12px; color: var(--slate-400); margin-bottom: 32px; line-height: 1.6;">
-            By initializing this node, you agree to the <a href="#" style="color:var(--brand-primary); text-decoration:none; font-weight:700;">Operational Protocols</a> and <a href="#" style="color:var(--brand-primary); text-decoration:none; font-weight:700;">Data Privacy Pact</a>.
-        </p>
-
-        <button type="submit" class="btn btn-primary" id="signupBtn" style="width: 100%; padding: 14px; font-size: 16px;">
-            <i class="fas fa-rocket"></i> Deploy Intelligence Node
-        </button>
-    </form>
-
-    <div style="text-align: center; margin-top: 32px; font-size: 14px; color: var(--slate-500); font-weight: 500;">
-        Already Authorized? <a href="login.html" style="color: var(--brand-primary); text-decoration: none; font-weight: 700;">Sync Existing Session</a>
+        <div style="margin-top: 40px; text-align: center; font-size: 14px; color: var(--slate-500); font-weight: 600;">
+            Already Initialized? <a href="login.html" style="color: var(--brand-secondary); text-decoration: none; font-weight: 800;">Secure Entry</a>
+        </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-client.js"></script>
-<script>
-    async function handleSignup() {
-        const full_name = document.getElementById('firstName').value + " " + document.getElementById('lastName').value;
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const investment_exp = document.getElementById('experience').value;
-        
-        const btn = document.getElementById('signupBtn');
-        const msg = document.getElementById('errorMsg');
-        
-        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Initializing...';
-        btn.disabled = true;
-        msg.style.display = 'none';
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.innerText = 'INITIALIZING...';
+            btn.disabled = true;
 
-        try {
-            const { data, error } = await supabase.auth.signUp({
-                email, password,
-                options: { data: { full_name, investment_exp } }
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const fullName = document.getElementById('fullName').value;
+
+            const { error } = await supabase.auth.signUp({
+                email,
+                password,
+                options: { data: { full_name: fullName } }
             });
-            if (error) throw error;
 
-            btn.style.background = 'var(--success)';
-            btn.innerHTML = '<i class="fas fa-check"></i> Deployment Successful';
-            msg.textContent = 'Node deployed. Authenticating current session...';
-            msg.style.display = 'block';
-            msg.style.background = 'var(--success-bg)';
-            msg.style.color = 'var(--success)';
-            
-            setTimeout(() => { window.location.href = 'login.html'; }, 2000);
-        } catch (error) {
-            btn.innerHTML = '<i class="fas fa-rocket"></i> Deploy Intelligence Node';
-            btn.disabled = false;
-            msg.textContent = error.message;
-            msg.style.display = 'block';
-            msg.style.background = 'var(--danger-bg)';
-            msg.style.color = 'var(--danger)';
-        }
-    }
-</script>
+            if (error) {
+                alert('Initialization Failed: ' + error.message);
+                btn.innerText = 'INITIALIZE PROTOCOL';
+                btn.disabled = false;
+            } else {
+                alert('Protocol Initiated. Please check your neural identity (email) for verification.');
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
 </body>
 </html>

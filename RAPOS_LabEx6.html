@@ -1,0 +1,222 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>RAPOS - Lab Ex 6</title>
+<style>
+body{font-family:Arial,sans-serif;font-size:11pt;margin:40px;color:#111;line-height:1.5}
+h1{text-align:center;font-size:16pt}
+h2{font-size:13pt;background:#0b1d4e;color:#fff;padding:6px 10px;margin-top:22px}
+h3{font-size:11pt;color:#0b1d4e;margin-top:14px;border-bottom:1px solid #ccc;padding-bottom:2px}
+table{width:100%;border-collapse:collapse;margin:8px 0;font-size:10pt}
+th{background:#0b1d4e;color:#fff;padding:6px 8px;text-align:left}
+td{border:1px solid #bbb;padding:5px 8px;vertical-align:top}
+tr:nth-child(even) td{background:#f4f7ff}
+.pass{color:green;font-weight:700}.fail{color:red;font-weight:700}
+.meta{background:#f0f4fb;border:1px solid #c7d9ff;padding:10px 14px;margin:10px 0;border-radius:6px}
+.meta p{margin:2px 0;font-size:10.5pt}
+/* Deployment diagram */
+.diag{display:flex;flex-direction:column;align-items:center;gap:0;margin:20px auto;max-width:600px}
+.tier{border-radius:10px;padding:12px 20px;text-align:center;width:100%;box-sizing:border-box;margin-bottom:0}
+.tier-label{font-size:9pt;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;opacity:.7}
+.tier-inner{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
+.node{background:#fff;border-radius:8px;padding:8px 14px;font-size:10pt;font-weight:700;min-width:90px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.node small{display:block;font-size:8pt;font-weight:400;color:#555;margin-top:2px}
+.arrow{text-align:center;font-size:18pt;color:#0b1d4e;line-height:1;margin:2px 0}
+.t1{background:#dbeafe}.t2{background:#d1fae5}.t3{background:#fef9c3}.t4{background:#ede9fe}.t5{background:#fee2e2}
+@media print{body{margin:16px}h2,th{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style></head><body>
+
+<h1>Lab Assignment — Week 11 &amp; 12</h1>
+<h1 style="font-size:13pt;margin-top:0">Testing &amp; Integration Requirements · RAPOS</h1>
+
+<div class="meta">
+<p><b>Department:</b> Computer Engineering &nbsp;|&nbsp; <b>Subject:</b> Agile Software Development and DevOps</p>
+<p><b>Lab Objective:</b> Testing and Integration Requirements</p>
+<p><b>Lab Outcome:</b> Test Scenarios, Test Cases and Deployment Diagrams</p>
+<p><b>Team:</b> Abhi Virani, Dhruv Trivedi, Dhruvish Chaudhari, Henil Malani (1AUA23BCS062)</p>
+<p><b>Mentor:</b> Prof. Himani Prajapati &nbsp;|&nbsp; <b>Deadline:</b> 27 April 2026</p>
+</div>
+
+<!-- ===== TEST STRATEGY ===== -->
+<h2>1. Test Strategy</h2>
+
+<h3>1.1 Overview</h3>
+<p>RAPOS (Risk-Aware Portfolio Optimisation System) is a full-stack AI financial terminal. The test strategy covers all layers: unit tests on the LSTM model and FastAPI backend, integration tests across frontend–backend–database, and end-to-end UI tests using Selenium IDE. The goal is to ensure correctness, performance, and security before each Vercel deployment.</p>
+
+<h3>1.2 Testing Levels</h3>
+<table>
+<tr><th>Level</th><th>Scope</th><th>Tool</th><th>Responsible</th></tr>
+<tr><td>Unit Testing</td><td>LSTM functions, risk score logic, API endpoints</td><td>PyTest, Postman</td><td>Developer</td></tr>
+<tr><td>Integration Testing</td><td>Frontend ↔ FastAPI ↔ Supabase data flow</td><td>Postman, Manual</td><td>Developer</td></tr>
+<tr><td>System Testing</td><td>End-to-end user flows on rapos.vercel.app</td><td>Selenium IDE</td><td>QA Tester</td></tr>
+<tr><td>Acceptance Testing</td><td>Feature verification per acceptance criteria</td><td>Manual</td><td>Team + Mentor</td></tr>
+<tr><td>Performance Testing</td><td>API response time &lt; 3s, 10s heartbeat accuracy</td><td>Manual / Postman</td><td>Developer</td></tr>
+</table>
+
+<h3>1.3 Test Environment</h3>
+<table>
+<tr><th>Component</th><th>Technology</th><th>URL / Location</th></tr>
+<tr><td>Frontend</td><td>HTML5 / JS / CSS3</td><td>https://rapos.vercel.app</td></tr>
+<tr><td>Backend (AI)</td><td>Python FastAPI</td><td>https://rapos-api.onrender.com</td></tr>
+<tr><td>Database</td><td>Supabase PostgreSQL</td><td>Supabase Cloud (Singapore)</td></tr>
+<tr><td>LSTM Model</td><td>Keras / TensorFlow</td><td>Loaded in FastAPI on startup</td></tr>
+<tr><td>Test Browser</td><td>Google Chrome</td><td>Selenium IDE extension</td></tr>
+</table>
+
+<!-- ===== TEST SCENARIOS ===== -->
+<h2>2. Test Scenarios</h2>
+<table>
+<tr><th>TS ID</th><th>Module</th><th>Scenario Description</th><th>Type</th></tr>
+<tr><td>TS-01</td><td>Auth</td><td>User can register, login, and logout successfully</td><td>Functional</td></tr>
+<tr><td>TS-02</td><td>Auth</td><td>System rejects invalid credentials and empty inputs</td><td>Negative</td></tr>
+<tr><td>TS-03</td><td>Portfolio</td><td>User can add multiple holdings and view real-time net worth</td><td>Functional</td></tr>
+<tr><td>TS-04</td><td>Portfolio</td><td>Deleting a holding immediately updates net worth</td><td>Integration</td></tr>
+<tr><td>TS-05</td><td>AI Prediction</td><td>LSTM returns prediction, risk score, sentiment for valid ticker</td><td>Functional</td></tr>
+<tr><td>TS-06</td><td>AI Prediction</td><td>System handles invalid ticker gracefully with error message</td><td>Negative</td></tr>
+<tr><td>TS-07</td><td>Rebalancer</td><td>AI Rebalancer outputs BUY/SELL signals for all 3 risk profiles</td><td>Functional</td></tr>
+<tr><td>TS-08</td><td>Market Hub</td><td>Market Hub loads live movers and TradingView chart</td><td>Functional</td></tr>
+<tr><td>TS-09</td><td>Realtime</td><td>Dashboard net worth updates every 10s without refresh</td><td>Performance</td></tr>
+<tr><td>TS-10</td><td>Security</td><td>Unauthenticated user cannot access dashboard</td><td>Security</td></tr>
+<tr><td>TS-11</td><td>API</td><td>All FastAPI endpoints return correct status codes</td><td>Integration</td></tr>
+<tr><td>TS-12</td><td>Export</td><td>PDF export generates complete portfolio terminal report</td><td>Functional</td></tr>
+</table>
+
+<!-- ===== UNIT TEST CASES ===== -->
+<h2>3. Unit Test Cases</h2>
+<h3>3.1 Backend — FastAPI (PyTest)</h3>
+<table>
+<tr><th>TC ID</th><th>Function Under Test</th><th>Input</th><th>Expected Output</th><th>Status</th></tr>
+<tr><td>UT-01</td><td>calculate_risk_score()</td><td>volatility=0.03, sharpe=1.5</td><td>risk_score between 1–10</td><td class="pass">Pass</td></tr>
+<tr><td>UT-02</td><td>predict_price(ticker)</td><td>ticker="AAPL"</td><td>Float value &gt; 0</td><td class="pass">Pass</td></tr>
+<tr><td>UT-03</td><td>get_sentiment(return_pct)</td><td>return_pct=2.5</td><td>"Bullish"</td><td class="pass">Pass</td></tr>
+<tr><td>UT-04</td><td>get_sentiment(return_pct)</td><td>return_pct=-1.2</td><td>"Bearish"</td><td class="pass">Pass</td></tr>
+<tr><td>UT-05</td><td>normalize_data(prices)</td><td>[100,110,105,120]</td><td>All values in [0,1]</td><td class="pass">Pass</td></tr>
+<tr><td>UT-06</td><td>build_sequence(data, window=60)</td><td>Array of 100 prices</td><td>Shape: (40, 60, 1)</td><td class="pass">Pass</td></tr>
+<tr><td>UT-07</td><td>GET /api/predict-risk?ticker=AAPL</td><td>ticker=AAPL</td><td>HTTP 200, JSON with predicted_price</td><td class="pass">Pass</td></tr>
+<tr><td>UT-08</td><td>GET /api/predict-risk?ticker=ZZZ</td><td>ticker=ZZZ (invalid)</td><td>HTTP 422 or error JSON</td><td class="pass">Pass</td></tr>
+</table>
+
+<h3>3.2 Frontend — JavaScript Logic</h3>
+<table>
+<tr><th>TC ID</th><th>Function</th><th>Test Condition</th><th>Expected</th><th>Status</th></tr>
+<tr><td>UT-09</td><td>formatCurrency(val)</td><td>val = 12500.5</td><td>"$12,500.50"</td><td class="pass">Pass</td></tr>
+<tr><td>UT-10</td><td>calculateNetWorth(holdings)</td><td>2 holdings totalling $5000</td><td>$5000</td><td class="pass">Pass</td></tr>
+<tr><td>UT-11</td><td>validateTicker(str)</td><td>"AAPL"</td><td>true</td><td class="pass">Pass</td></tr>
+<tr><td>UT-12</td><td>validateTicker(str)</td><td>"" (empty)</td><td>false</td><td class="pass">Pass</td></tr>
+</table>
+
+<!-- ===== INTEGRATION TEST CASES ===== -->
+<h2>4. Integration Test Cases</h2>
+<table>
+<tr><th>TC ID</th><th>Scenario</th><th>Components Involved</th><th>Steps</th><th>Expected</th><th>Status</th></tr>
+<tr><td>IT-01</td><td>Login → Dashboard data load</td><td>Supabase Auth + Frontend</td><td>Login with valid creds → open dashboard</td><td>Holdings and net worth loaded from Supabase</td><td class="pass">Pass</td></tr>
+<tr><td>IT-02</td><td>Add holding → Real-time sync</td><td>Frontend + FastAPI + Supabase</td><td>POST /api/holdings → check dashboard</td><td>New holding appears without page refresh</td><td class="pass">Pass</td></tr>
+<tr><td>IT-03</td><td>Delete holding → Net worth update</td><td>Frontend + Supabase Realtime</td><td>DELETE /api/holdings/{id} → observe UI</td><td>Net worth decreases; row removed instantly</td><td class="pass">Pass</td></tr>
+<tr><td>IT-04</td><td>Prediction API → UI card</td><td>Frontend + FastAPI + LSTM</td><td>Enter TSLA → click Predict → observe card</td><td>Predicted price, risk score, sentiment shown</td><td class="pass">Pass</td></tr>
+<tr><td>IT-05</td><td>Rebalancer → Supabase read</td><td>Frontend + Supabase DB</td><td>Click Optimise (Moderate) → observe output</td><td>BUY/SELL signals based on current portfolio</td><td class="pass">Pass</td></tr>
+<tr><td>IT-06</td><td>Unauthenticated API call</td><td>Frontend + Supabase RLS</td><td>Call /api/holdings without token</td><td>HTTP 401 Unauthorized</td><td class="pass">Pass</td></tr>
+<tr><td>IT-07</td><td>Market Hub live data</td><td>Frontend + Finnhub API</td><td>Open Market Hub tab → wait 5s</td><td>Live stock quotes and movers populated</td><td class="pass">Pass</td></tr>
+</table>
+
+<!-- ===== ACCEPTANCE CRITERIA ===== -->
+<h2>5. Acceptance Test Criteria</h2>
+<table>
+<tr><th>Feature</th><th>Acceptance Criterion</th><th>Verified?</th></tr>
+<tr><td>Authentication</td><td>User can register and login within 5 seconds; invalid credentials show error</td><td class="pass">Yes</td></tr>
+<tr><td>Portfolio Management</td><td>Holdings add/delete with immediate UI update; net worth calculated correctly</td><td class="pass">Yes</td></tr>
+<tr><td>LSTM Prediction</td><td>Prediction returned in &lt; 3 seconds for any valid ticker with risk score (1–10)</td><td class="pass">Yes</td></tr>
+<tr><td>AI Rebalancer</td><td>All 3 profiles (Conservative/Moderate/Aggressive) output valid BUY/SELL signals</td><td class="pass">Yes</td></tr>
+<tr><td>Real-time Sync</td><td>Dashboard updates portfolio data every 10 seconds without page reload</td><td class="pass">Yes</td></tr>
+<tr><td>Market Hub</td><td>Live market movers and embedded TradingView chart load within 5 seconds</td><td class="pass">Yes</td></tr>
+<tr><td>Security</td><td>Unauthenticated users cannot access dashboard or API endpoints (RLS active)</td><td class="pass">Yes</td></tr>
+<tr><td>PDF Export</td><td>Export generates complete, formatted portfolio report in PDF format</td><td class="pass">Yes</td></tr>
+<tr><td>Deployment</td><td>Frontend live on rapos.vercel.app; Backend live on Render; CI/CD via GitHub</td><td class="pass">Yes</td></tr>
+</table>
+
+<!-- ===== DEPLOYMENT DIAGRAM ===== -->
+<h2>6. Deployment Scheme &amp; Diagram</h2>
+
+<h3>6.1 Deployment Architecture Description</h3>
+<p>RAPOS uses a 3-tier cloud deployment architecture. The <b>Presentation Tier</b> is hosted on Vercel's global CDN edge network. The <b>Application Tier</b> runs on Render.com as a Python FastAPI server with the LSTM model loaded in memory. The <b>Data Tier</b> uses Supabase (managed PostgreSQL) with Row-Level Security and Realtime WebSocket subscriptions.</p>
+
+<h3>6.2 Deployment Diagram</h3>
+<div class="diag">
+
+  <!-- Tier: Client -->
+  <div class="tier t1">
+    <div class="tier-label">Client Layer</div>
+    <div class="tier-inner">
+      <div class="node">🌐 Browser<small>Chrome / Firefox</small></div>
+      <div class="node">📱 Mobile<small>Android / iOS</small></div>
+    </div>
+  </div>
+  <div class="arrow">↕ HTTPS</div>
+
+  <!-- Tier: CDN -->
+  <div class="tier t2">
+    <div class="tier-label">CDN / Presentation Tier</div>
+    <div class="tier-inner">
+      <div class="node">▲ Vercel Edge<small>rapos.vercel.app</small></div>
+      <div class="node">📄 Static Files<small>HTML · CSS · JS</small></div>
+    </div>
+  </div>
+  <div class="arrow">↕ REST API (HTTPS)</div>
+
+  <!-- Tier: Backend -->
+  <div class="tier t3">
+    <div class="tier-label">Application / AI Tier</div>
+    <div class="tier-inner">
+      <div class="node">⚡ FastAPI<small>Render.com · Python</small></div>
+      <div class="node">🧠 LSTM Model<small>Keras · TensorFlow</small></div>
+      <div class="node">🔌 Finnhub API<small>Live Market Data</small></div>
+    </div>
+  </div>
+  <div class="arrow">↕ SQL + WebSocket</div>
+
+  <!-- Tier: Database -->
+  <div class="tier t4">
+    <div class="tier-label">Data Tier</div>
+    <div class="tier-inner">
+      <div class="node">🗄️ Supabase<small>PostgreSQL + RLS</small></div>
+      <div class="node">🔄 Realtime<small>WebSocket Sub</small></div>
+      <div class="node">🔐 Auth<small>Email / Password</small></div>
+    </div>
+  </div>
+  <div class="arrow">↕ Push (git)</div>
+
+  <!-- Tier: CI/CD -->
+  <div class="tier t5">
+    <div class="tier-label">CI / CD Pipeline</div>
+    <div class="tier-inner">
+      <div class="node">🐙 GitHub<small>main branch</small></div>
+      <div class="node">▲ Vercel Deploy<small>Auto on push</small></div>
+      <div class="node">🟢 Render Deploy<small>Auto on push</small></div>
+    </div>
+  </div>
+
+</div>
+
+<h3>6.3 Deployment Flow</h3>
+<table>
+<tr><th>Step</th><th>Action</th><th>Platform</th><th>Result</th></tr>
+<tr><td>1</td><td>Developer pushes code to GitHub main branch</td><td>GitHub</td><td>CI/CD pipeline triggered</td></tr>
+<tr><td>2</td><td>Vercel auto-detects push → builds frontend</td><td>Vercel</td><td>Static files deployed to global CDN edge</td></tr>
+<tr><td>3</td><td>Render auto-detects push → restarts FastAPI server</td><td>Render.com</td><td>LSTM model loaded, API live</td></tr>
+<tr><td>4</td><td>User visits rapos.vercel.app → HTML/JS served from CDN</td><td>Browser</td><td>Frontend loads instantly</td></tr>
+<tr><td>5</td><td>JS calls FastAPI for predictions → FastAPI runs LSTM</td><td>Render → Keras</td><td>Prediction JSON returned &lt;3s</td></tr>
+<tr><td>6</td><td>Supabase Realtime pushes DB changes to browser</td><td>Supabase → Browser</td><td>Portfolio updates without refresh</td></tr>
+</table>
+
+<h3>6.4 Deployment Requirements</h3>
+<table>
+<tr><th>Component</th><th>Requirement</th><th>Specification</th></tr>
+<tr><td>Frontend Host</td><td>Vercel (Free/Pro)</td><td>Node.js build, global CDN, HTTPS</td></tr>
+<tr><td>Backend Host</td><td>Render.com (Free Tier)</td><td>Python 3.11, 512MB RAM, auto-sleep</td></tr>
+<tr><td>Database</td><td>Supabase Free Tier</td><td>PostgreSQL, 500MB, Realtime enabled</td></tr>
+<tr><td>Domain</td><td>rapos.vercel.app</td><td>Vercel-assigned SSL certificate</td></tr>
+<tr><td>Environment Variables</td><td>Supabase URL + Key, Finnhub Key</td><td>Stored in Vercel &amp; Render env settings</td></tr>
+<tr><td>LSTM Model File</td><td>rapos_lstm_model.h5</td><td>Committed to backend/ folder, loaded on startup</td></tr>
+</table>
+
+<hr style="margin-top:36px">
+<p style="text-align:center;font-size:9pt;color:#666">RAPOS · Lab Assignment Week 11–12 · Adani University · B.Tech BCE · Agile Software Development and DevOps · 2025–26<br>
+Abhi Virani, Dhruv Trivedi, Dhruvish Chaudhari, Henil Malani<br>
+Mentor: Prof. Himani Prajapati</p>
+</body></html>

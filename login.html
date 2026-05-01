@@ -3,131 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | RAPOS Terminal</title>
+    <title>RAPOS | Secure Node Entry</title>
     <link rel="stylesheet" href="s1.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            background: radial-gradient(circle at top left, #f8fafc 0%, #e2e8f0 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-
-        .auth-surface {
-            width: 100%;
-            max-width: 440px;
-            padding: 48px;
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            border-radius: 32px;
-            box-shadow: var(--shadow-float);
-            animation: authIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes authIn {
-            from { opacity: 0; transform: translateY(20px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 14px 16px;
-            background: white;
-            border: 1px solid var(--slate-200);
-            border-radius: 12px;
-            font-family: 'Inter', sans-serif;
-            font-size: 15px;
-            color: var(--slate-900);
-            transition: all 0.2s ease;
-            margin-bottom: 20px;
-        }
-
-        .input-field:focus {
-            outline: none;
-            border-color: var(--brand-primary);
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-        }
-
-        #errorMsg {
-            background: var(--danger-bg);
-            color: var(--danger);
-            padding: 12px;
-            border-radius: 12px;
-            margin-bottom: 24px;
-            font-size: 13px;
-            font-weight: 600;
-            display: none;
-            text-align: center;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-        }
-    </style>
 </head>
-<body>
+<body style="background: #020617; display: flex; align-items: center; justify-content: center; min-height: 100vh;">
 
-<div class="auth-surface">
-    <div style="text-align: center; margin-bottom: 40px;">
-        <div class="sidebar-logo" style="padding: 0; margin-bottom: 12px; font-size: 32px;">RAPOS</div>
-        <p style="color: var(--slate-500); font-weight: 500;">Terminal Intelligence Authentication</p>
-    </div>
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.08) 0%, transparent 70%); z-index: -1;"></div>
 
-    <div id="errorMsg">Authentication node rejected credentials.</div>
-
-    <form id="loginForm" onsubmit="event.preventDefault(); handleLogin();">
-        <div style="margin-bottom: 8px; font-size: 12px; font-weight: 700; color: var(--slate-400); text-transform: uppercase; letter-spacing: 0.5px;">Identity (Email)</div>
-        <input type="email" id="email" class="input-field" placeholder="operator@rapos.cloud" required>
-
-        <div style="margin-bottom: 8px; font-size: 12px; font-weight: 700; color: var(--slate-400); text-transform: uppercase; letter-spacing: 0.5px;">Access Key (Password)</div>
-        <input type="password" id="password" class="input-field" placeholder="••••••••" required>
-
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
-            <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--slate-500); font-weight: 600; cursor: pointer;">
-                <input type="checkbox" style="width: auto;"> Persistent Session
-            </label>
-            <a href="#" style="font-size: 13px; color: var(--brand-primary); text-decoration: none; font-weight: 700;">Reset Key?</a>
+    <div class="card" style="width: 100%; max-width: 440px; padding: 56px; border-radius: 40px; box-shadow: 0 40px 80px -20px rgba(0,0,0,0.8);">
+        <div style="text-align: center; margin-bottom: 48px;">
+            <div class="sidebar-logo" style="padding: 0; margin-bottom: 24px; font-size: 40px; display: inline-block;">RAPOS</div>
+            <h2 style="font-size: 24px; margin-bottom: 12px;">Welcome Back, Operator</h2>
+            <p style="color: var(--slate-400); font-weight: 500;">Secure your neural node session.</p>
         </div>
 
-        <button type="submit" class="btn btn-primary" id="loginBtn" style="width: 100%; padding: 14px; font-size: 16px;">
-            <i class="fas fa-shield-alt"></i> Initialize Session
-        </button>
-    </form>
+        <form id="loginForm" style="display: flex; flex-direction: column; gap: 24px;">
+            <div>
+                <div class="stat-label">Neural Identity</div>
+                <input id="email" type="email" class="input-field" placeholder="operator@rapos.ai" required>
+            </div>
+            <div>
+                <div class="stat-label">Security Protocol</div>
+                <input id="password" type="password" class="input-field" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 18px; margin-top: 12px;">
+                Authenticate Session
+            </button>
+        </form>
 
-    <div style="text-align: center; margin-top: 32px; font-size: 14px; color: var(--slate-500); font-weight: 500;">
-        New Operator? <a href="signup.html" style="color: var(--brand-primary); text-decoration: none; font-weight: 700;">Request Node Access</a>
+        <div style="margin-top: 40px; text-align: center; font-size: 14px; color: var(--slate-500); font-weight: 600;">
+            New Operator? <a href="signup.html" style="color: var(--brand-primary); text-decoration: none; font-weight: 800;">Initialize Node</a>
+        </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-client.js"></script>
-<script>
-    async function handleLogin() {
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const btn = document.getElementById('loginBtn');
-        const err = document.getElementById('errorMsg');
-        
-        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Authenticating...';
-        btn.disabled = true;
-        err.style.display = 'none';
-        
-        try {
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-            if (error) throw error;
-            if (data.user) {
-                btn.style.background = 'var(--success)';
-                btn.innerHTML = '<i class="fas fa-check"></i> Session Verified';
-                setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = 'AUTHENTICATING...';
+            btn.disabled = true;
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                alert('Authentication Failed: ' + error.message);
+                btn.innerText = originalText;
+                btn.disabled = false;
+            } else {
+                window.location.href = 'dashboard.html';
             }
-        } catch (error) {
-            btn.innerHTML = '<i class="fas fa-shield-alt"></i> Initialize Session';
-            btn.disabled = false;
-            err.textContent = error.message;
-            err.style.display = 'block';
-        }
-    }
-</script>
+        });
+    </script>
 </body>
 </html>

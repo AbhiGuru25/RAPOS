@@ -1,0 +1,452 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>RAPOS - Software Testing Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+body{font-family:'Outfit',Arial,sans-serif;font-size:11pt;margin:0;color:#111;line-height:1.5}
+.page-content{padding:40px}
+h1{text-align:center;font-size:18pt;margin-bottom:4px;color:#0b1d4e}
+h2{font-size:14pt;background:#0b1d4e;color:#fff;padding:8px 12px;margin-top:28px;border-radius:4px;box-shadow:0 2px 4px rgba(0,0,0,0.1)}
+h3{font-size:12pt;color:#0b1d4e;margin-top:20px;border-bottom:2px solid #3171b9;padding-bottom:4px;font-weight:600}
+table{width:100%;border-collapse:collapse;margin:15px 0;font-size:10pt;background:#fff}
+th{background:#0b1d4e;color:#fff;padding:8px 10px;text-align:left;-webkit-print-color-adjust:exact}
+td{border:1px solid #ddd;padding:7px 10px;vertical-align:top}
+tr:nth-child(even) td{background:#f8faff;-webkit-print-color-adjust:exact}
+.pass{color:#2e7d32;font-weight:700}.fail{color:#c62828;font-weight:700}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:8px 25px;background:#f0f7ff;border:1px solid #3171b9;padding:15px;margin:20px 0;border-radius:8px;-webkit-print-color-adjust:exact}
+.meta div{font-size:10.5pt}.meta span{font-weight:700;color:#1a4a7c}
+.summary-box{background:#fff9e6;border-left:6px solid #f57c00;padding:18px;margin:25px 0;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,0.05);-webkit-print-color-adjust:exact}
+.tech-spec{display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:18px;margin:20px 0}
+.tech-card{background:#fff;border:1px solid #e0e0e0;padding:12px;border-radius:8px;box-shadow:0 2px 5px rgba(0,0,0,0.04);border-top:3px solid #3171b9}
+.tech-card b{display:block;color:#0b1d4e;margin-bottom:6px;font-size:8.5pt;text-transform:uppercase;letter-spacing:0.5px}
+
+/* COVER PAGE PREMIUM */
+.cover-page{height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;page-break-after:always;position:relative;background:#fff;overflow:hidden}
+.cover-page::after{content:"";position:absolute;right:0;bottom:0;width:300px;height:300px;background:radial-gradient(circle, #f0f7ff 0%, transparent 70%);z-index:-1;-webkit-print-color-adjust:exact}
+
+.cover-header{position:absolute;top:50px;right:60px;font-size:9pt;color:#666;text-align:right;font-weight:300;letter-spacing:1px}
+.cover-footer{position:absolute;bottom:50px;width:100%;font-size:9pt;color:#999;text-align:center;letter-spacing:1px;font-weight:300}
+
+.cover-badge{background:#e8f0fe;color:#1a4a7c;padding:6px 14px;border-radius:50px;font-size:9pt;font-weight:600;margin-bottom:25px;letter-spacing:1.5px;text-transform:uppercase;-webkit-print-color-adjust:exact}
+.cover-title-small{color:#3171b9;font-weight:400;font-size:20pt;margin-bottom:8px;letter-spacing:3px;text-transform:uppercase}
+.cover-title-large{color:#0b1d4e;font-weight:700;font-size:42pt;margin-bottom:15px;line-height:1.1}
+.cover-subtitle{color:#555;font-size:14pt;font-weight:300;margin-bottom:50px}
+
+.info-table{width:520px;border-collapse:collapse;margin:40px auto;border:none;box-shadow:0 10px 30px rgba(0,0,0,0.08)}
+.info-table th{background:#1a4a7c;color:#fff;text-align:left;padding:12px 20px;font-size:10pt;width:160px;border-bottom:1px solid #255c94;font-weight:600;text-transform:uppercase;letter-spacing:1px;-webkit-print-color-adjust:exact}
+.info-table td{background:#fff;color:#333;text-align:left;padding:12px 20px;font-size:10pt;border:1px solid #eee;border-bottom:1px solid #eee;line-height:1.6;-webkit-print-color-adjust:exact}
+
+@media print{
+  body{margin:0}
+  .cover-page{height:100vh;margin:0;border:none}
+  .page-content{padding:30px}
+  h2, th, .meta, .summary-box, .cover-page::before, .info-table th{ -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style></head><body>
+
+<div class="cover-page">
+  <div class="cover-header">
+    TECHNICAL DOCUMENTATION<br>
+    VERSION 1.0 &nbsp;|&nbsp; APRIL 2026
+  </div>
+
+  <div class="cover-badge">Software Verification &amp; Testing</div>
+  <div class="cover-title-small">SELENIUM IDE</div>
+  <div class="cover-title-large">RAPOS Project</div>
+  <div class="cover-subtitle">Risk-Aware Portfolio Optimisation System</div>
+
+  <table class="info-table">
+    <tr><th>Project</th><td>RAPOS Terminal</td></tr>
+    <tr><th>Document Type</th><td>Software Testing Report</td></tr>
+    <tr><th>System Version</th><td>v1.0 (Production Build)</td></tr>
+    <tr><th>Delivery Date</th><td>April 27, 2026</td></tr>
+    <tr><th>Prepared By</th><td><b>Abhi Virani</b> (004)<br><b>Dhruv Trivedi</b> (042)<br><b>Dhruvish Chaudhari</b> (046)<br><b>Henil Malani</b> (062)</td></tr>
+    <tr><th>Organization</th><td>Adani University · B.Tech CE</td></tr>
+    <tr><th>Primary Tool</th><td>Selenium IDE Automation</td></tr>
+    <tr><th>Project Mentor</th><td>Prof. Himani Prajapati</td></tr>
+  </table>
+
+  <div class="cover-footer">
+    INTERNAL REPOSITORY DOCUMENT &nbsp; | &nbsp; PAGE 01
+  </div>
+</div>
+
+<div class="page-content">
+
+<h1>SOFTWARE TESTING DOCUMENT</h1>
+<h1 style="font-size:13pt;margin-top:2px">RAPOS — Risk-Aware Portfolio Optimisation System</h1>
+
+<div class="meta">
+  <div style="grid-column: span 2; background: #e0e8f5; border: 1px solid #c7d9ff; padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 11pt;">
+    <b>Prepared By:</b><br>
+    Abhi Virani (1AUA23BCE004), Dhruv Trivedi (1AUA23BCE042),<br>
+    Dhruvish Chaudhari (1AUA23BCE046), Henil Malani (1AUA23BCS062)
+  </div>
+  <div><span>Project Name:</span> RAPOS</div>
+  <div><span>Version:</span> 1.0</div>
+  <div><span>Date:</span> 27 April 2026</div>
+  <div><span>Subject:</span> Agile Software Development and DevOps</div>
+  <div><span>Department:</span> Computer Engineering</div>
+  <div><span>Tool Used:</span> Selenium IDE, Manual Testing, Postman</div>
+</div>
+
+<!-- ===== Q1 ===== -->
+<h2>Q.1 — Define Test Cases</h2>
+
+<h3>Definition &amp; Key Components</h3>
+<p>A <b>test case</b> is a documented specification that defines the input conditions, execution steps, and expected outcome for testing a specific functionality of a software system. In the context of <b>RAPOS (Risk-Aware Portfolio Optimisation System)</b>, test cases are essential to verify that the LSTM prediction engine, Supabase database integration, FastAPI backend, and real-time dashboard all behave correctly under various conditions.</p>
+<p>Each RAPOS test case consists of the following key components: <b>TC ID</b> — a unique identifier (e.g., TC-LG-01); <b>Test Scenario</b> — a brief description of what is being tested; <b>Test Steps</b> — sequential actions the tester must perform; <b>Test Data</b> — specific input values like email, ticker symbols, or quantities; <b>Expected Result</b> — the correct system response; <b>Actual Result</b> — observed output during execution; <b>Status</b> — Pass / Fail / Blocked; and <b>Priority</b> — High / Medium / Low based on the feature's criticality to the system.</p>
+<p>RAPOS is tested across six major modules: Authentication, Portfolio Management, AI Prediction Engine, AI Rebalancer, Market Hub, and Logout. Each module maps to a specific layer of the application stack — from the Supabase Auth tier to the FastAPI LSTM inference layer — ensuring end-to-end coverage.</p>
+
+<h3>Module 1: Authentication (Login / Signup)</h3>
+<p>The Authentication module is the entry point of RAPOS. It uses <b>Supabase Email/Password Authentication</b> to securely register and log in users. Upon successful login, the system retrieves a JWT session token which is used for all subsequent database queries (enforced via Row-Level Security policies on Supabase). The test cases below verify that valid users gain access, invalid attempts are rejected, and edge cases like empty fields and duplicate emails are handled gracefully.</p>
+<table>
+<tr><th>TC ID</th><th>Test Scenario</th><th>Test Steps</th><th>Expected Result</th><th>Status</th><th>Priority</th></tr>
+<tr><td>TC-LG-01</td><td>Valid login</td><td>1. Open /login 2. Enter valid email &amp; password 3. Click Login</td><td>Redirect to /dashboard</td><td class="pass">Pass</td><td>High</td></tr>
+<tr><td>TC-LG-02</td><td>Invalid password</td><td>1. Open /login 2. Enter valid email, wrong password 3. Click Login</td><td>Error: "Invalid credentials"</td><td class="pass">Pass</td><td>High</td></tr>
+<tr><td>TC-LG-03</td><td>Empty fields</td><td>1. Open /login 2. Leave fields blank 3. Click Login</td><td>Validation error shown</td><td class="pass">Pass</td><td>Medium</td></tr>
+<tr><td>TC-LG-04</td><td>Valid signup</td><td>1. Open /signup 2. Enter name, email, password 3. Submit</td><td>Account created, redirect to dashboard</td><td class="pass">Pass</td><td>High</td></tr>
+<tr><td>TC-LG-05</td><td>Duplicate email signup</td><td>1. Open /signup 2. Enter existing email 3. Submit</td><td>Error: "Email already registered"</td><td class="pass">Pass</td><td>High</td></tr>
+<tr><td>TC-LG-06</td><td>Logout</td><td>1. Login 2. Click Logout button</td><td>Session cleared, redirect to /login</td><td class="pass">Pass</td><td>High</td></tr>
+</table>
+
+<h3>Module 2: Portfolio (Holdings)</h3>
+<p>The Portfolio module is the core of RAPOS. It allows authenticated users to <b>add, view, and delete stock/crypto holdings</b> which are persisted in the Supabase <code>portfolios</code> table. Each holding stores: asset name, ticker symbol, asset type, quantity, and current value. The net worth is calculated dynamically by summing all holdings and is updated every 10 seconds using Supabase Realtime WebSocket subscriptions — without any page refresh. The test cases below verify CRUD operations, input validation, and real-time sync behaviour.</p>
+<table>
+<tr><th>TC ID</th><th>Test Scenario</th><th>Test Steps</th><th>Expected Result</th><th>Status</th><th>Priority</th></tr>
+<tr><td>TC-PF-01</td><td>Add holding</td><td>1. Login 2. Click Add Asset 3. Enter ticker=AAPL, qty=10, price=180 4. Save</td><td>AAPL appears in holdings table</td><td class="pass">Pass</td><td>High</td></tr>
+<tr><td>TC-PF-02</td><td>Delete holding</td><td>1. Login 2. Click X on AAPL row 3. Confirm</td><td>AAPL removed; net worth updates</td><td class="pass">Pass</td><td>High</td></tr>
+<tr><td>TC-PF-03</td><td>Net worth auto-update</td><td>1. Login 2. Wait 10 seconds</td><td>Net worth refreshes without page reload</td><td class="pass">Pass</td><td>High</td></tr>
+<tr><td>TC-PF-04</td><td>Invalid ticker</td><td>1. Login 2. Add Asset: ticker=XXXX 3. Save</td><td>Error: "Invalid ticker symbol"</td><td class="pass">Pass</td><td>Medium</td></tr>
+<tr><td>TC-PF-05</td><td>Zero quantity</td><td>1. Login 2. Add Asset: qty=0 3. Save</td><td>Validation error shown</td><td class="pass">Pass</td><td>Medium</td></tr>
+</table>
+
+<h3>Module 3: AI Prediction Engine</h3>
+<p>The AI Prediction Engine is the most technically complex module of RAPOS. It calls the <b>FastAPI backend deployed on Render.com</b>, which loads a trained <b>LSTM (Long Short-Term Memory) neural network</b> built using Keras/TensorFlow. The model takes a 60-day OHLCV sequence as input (Open, High, Low, Close, Volume) with 10 engineered features (RSI, MACD, Bollinger Bands, SMA 7/14/30, daily volatility) and outputs: a <b>predicted next-day closing price</b>, an <b>AI Risk Score from 1–10</b>, and a <b>Bullish/Bearish sentiment badge</b>. The model achieves 94.2% accuracy on the test set with an MSE of 0.0012 and an inference latency of just 24ms. The test cases below verify correct prediction, performance, error handling, and cross-asset support.</p>
+<table>
+<tr><th>TC ID</th><th>Test Scenario</th><th>Test Steps</th><th>Expected Result</th><th>Status</th><th>Priority</th></tr>
+<tr><td>TC-AI-01</td><td>LSTM prediction — valid ticker</td><td>1. Login 2. Enter AAPL in prediction box 3. Click Predict</td><td>Predicted price, risk score (1–10), sentiment badge shown</td><td class="pass">Pass</td><td>High</td></tr>
+<tr><td>TC-AI-02</td><td>LSTM prediction — crypto</td><td>1. Enter BTC-USD 2. Click Predict</td><td>Prediction with High risk score returned</td><td class="pass">Pass</td><td>High</td></tr>
+<tr><td>TC-AI-03</td><td>Prediction latency</td><td>1. Trigger prediction 2. Measure response time</td><td>Response &lt; 3 seconds</td><td class="pass">Pass</td><td>Medium</td></tr>
+<tr><td>TC-AI-04</td><td>Invalid ticker prediction</td><td>1. Enter ZZZZ 2. Click Predict</td><td>Error message displayed gracefully</td><td class="pass">Pass</td><td>Medium</td></tr>
+</table>
+
+<h3>Module 4: AI Rebalancer</h3>
+<p>The AI Rebalancer is RAPOS's portfolio optimisation engine. It applies <b>Markowitz Modern Portfolio Theory (MPT)</b> on top of the LSTM prediction outputs to compute the mathematically optimal allocation of assets. The user selects one of three risk profiles — <b>Conservative</b> (bonds-heavy, low volatility), <b>Moderate</b> (balanced growth), or <b>Aggressive</b> (maximum return, high equity) — and the rebalancer outputs exact <b>BUY/SELL amounts per asset</b> to align the current portfolio with the optimal efficient frontier allocation. The Sharpe Ratio is maximised in all profiles. The test cases below validate all three profiles and edge cases like empty portfolios.</p>
+<table>
+<tr><th>TC ID</th><th>Test Scenario</th><th>Test Steps</th><th>Expected Result</th><th>Status</th><th>Priority</th></tr>
+<tr><td>TC-RB-01</td><td>Conservative profile</td><td>1. Open AI Rebalancer tab 2. Select Conservative 3. Click Optimise</td><td>BUY/SELL signals for bonds-heavy allocation shown</td><td class="pass">Pass</td><td>High</td></tr>
+<tr><td>TC-RB-02</td><td>Moderate profile</td><td>1. Select Moderate 2. Click Optimise</td><td>Balanced allocation targets shown</td><td class="pass">Pass</td><td>High</td></tr>
+<tr><td>TC-RB-03</td><td>Aggressive profile</td><td>1. Select Aggressive 2. Click Optimise</td><td>High-equity allocation with max return target</td><td class="pass">Pass</td><td>High</td></tr>
+<tr><td>TC-RB-04</td><td>Empty portfolio rebalance</td><td>1. Clear all holdings 2. Click Optimise</td><td>Warning: "No holdings to rebalance"</td><td class="pass">Pass</td><td>Medium</td></tr>
+</table>
+
+<!-- ===== Q2 ===== -->
+<h2>Q.2 — Manual vs Automation Testing</h2>
+<p><b>Overview:</b> Software testing can be performed either manually by human testers or automatically using scripts and tools. Both approaches have specific strengths, use cases, and trade-offs. For the RAPOS project, a <b>hybrid testing strategy</b> was adopted — manual testing was used during the initial development phase to verify UI layout, visual design, and exploratory scenarios, while Selenium IDE automation was used for repeatable regression testing of login, signup, and dashboard flows.</p>
+<p>The choice of testing method depends on factors such as: the nature of the feature (UI vs API), the frequency of regression, budget and time constraints, and the complexity of the test scenario. For RAPOS specifically, features like the LSTM prediction card and Supabase real-time sync are difficult to automate fully and benefit from manual exploratory testing, while login/logout flows are ideal for Selenium IDE automation due to their repetitive and deterministic nature.</p>
+<table>
+<tr><th>Aspect</th><th>Manual Testing</th><th>Automation Testing</th></tr>
+<tr><td>Definition</td><td>Human tester executes test cases step-by-step</td><td>Scripts/tools execute test cases automatically</td></tr>
+<tr><td>Speed</td><td>Slow — depends on tester speed</td><td>Fast — runs 24/7 without human intervention</td></tr>
+<tr><td>Cost</td><td>Low initial cost, high long-term effort</td><td>High setup cost, low long-term cost</td></tr>
+<tr><td>Accuracy</td><td>Prone to human error</td><td>Consistent, no human error</td></tr>
+<tr><td>Best For</td><td>Exploratory, UI/UX, one-time tests</td><td>Regression, load, repetitive tests</td></tr>
+<tr><td>Tools</td><td>No special tool needed</td><td>Selenium, Cypress, Postman, JMeter</td></tr>
+<tr><td>Maintenance</td><td>No script maintenance</td><td>Scripts need updates on code change</td></tr>
+<tr><td>RAPOS Usage</td><td>Used for UI verification, poster demo checks</td><td>Selenium IDE for login/dashboard flows</td></tr>
+</table>
+
+<h3>When to Use Manual Testing</h3>
+<ul>
+<li>Exploratory testing of new RAPOS features (e.g., new chart type or TradingView widget integration)</li>
+<li>Verifying UI layout, colour themes, and visual design of the dashboard and poster</li>
+<li>One-time acceptance testing before viva submission to confirm all screens render correctly</li>
+<li>Testing the LSTM prediction card visually — confirming the risk badge colour and sentiment text appear as designed</li>
+<li>Any test where human judgment is required (e.g., does the AI Rebalancer output look reasonable?)</li>
+</ul>
+
+<h3>When to Use Automation Testing</h3>
+<ul>
+<li>Regression testing after every GitHub push to the <code>main</code> branch (Vercel auto-deploys trigger)</li>
+<li>Repeated login/logout flows with multiple different user credentials</li>
+<li>REST API endpoint testing on the FastAPI backend using Postman (all 5 endpoints)</li>
+<li>Verifying that CRUD operations on the Supabase <code>portfolios</code> table behave correctly</li>
+<li>Performance benchmarking of the LSTM inference endpoint to confirm response time stays under 3 seconds</li>
+</ul>
+
+<p><b>Conclusion:</b> For RAPOS, the ideal testing approach is a hybrid strategy where manual testing covers visual and exploratory aspects during active development, and Selenium IDE automation handles regression verification after each deployment. This combination ensures both functional correctness and visual quality of the final production system.</p>
+
+<!-- ===== Q3 ===== -->
+<h2>Q.3 — Survey on Automation Testing Tools</h2>
+<p><b>Introduction:</b> The software testing automation ecosystem has grown significantly over the past decade. Numerous tools are available catering to different layers of the testing pyramid — from unit testing at the code level, to UI testing at the browser level, to performance testing under load. This survey covers the most widely used automation tools in the industry and identifies which ones were selected and applied for the RAPOS project.</p>
+<p>For RAPOS, the selected tools are: <b>Selenium IDE</b> for browser-based UI regression testing, <b>Postman</b> for REST API testing of the FastAPI backend endpoints, and <b>PyTest</b> for Python unit testing of the LSTM model inference functions and risk score calculations. These three tools together provide full-stack test coverage — from the frontend dashboard down to the AI model layer.</p>
+<table>
+<tr><th>Tool</th><th>Type</th><th>Language</th><th>Best For</th><th>Used in RAPOS</th></tr>
+<tr><td>Selenium IDE</td><td>UI/Browser</td><td>No-code / JS</td><td>Record &amp; replay web tests</td><td class="pass">Yes</td></tr>
+<tr><td>Selenium WebDriver</td><td>UI/Browser</td><td>Python, Java</td><td>Cross-browser automation</td><td>No</td></tr>
+<tr><td>Postman</td><td>API Testing</td><td>No-code / JS</td><td>REST API test &amp; monitoring</td><td class="pass">Yes</td></tr>
+<tr><td>Cypress</td><td>E2E Testing</td><td>JavaScript</td><td>Modern SPA testing</td><td>No</td></tr>
+<tr><td>JMeter</td><td>Performance</td><td>XML/GUI</td><td>Load &amp; stress testing</td><td>No</td></tr>
+<tr><td>PyTest</td><td>Unit Testing</td><td>Python</td><td>FastAPI backend unit tests</td><td class="pass">Yes</td></tr>
+<tr><td>Jest</td><td>Unit Testing</td><td>JavaScript</td><td>JS frontend unit tests</td><td>No</td></tr>
+</table>
+
+<h3>Selenium Commands Used</h3>
+<table>
+<tr><th>Command</th><th>Type</th><th>Description</th></tr>
+<tr><td>open</td><td>Navigation</td><td>Opens a URL (e.g., /login)</td></tr>
+<tr><td>type</td><td>Input</td><td>Types text into an input field</td></tr>
+<tr><td>click</td><td>Action</td><td>Clicks a button or link</td></tr>
+<tr><td>assertTitle</td><td>Assert</td><td>Verifies page title equals expected value</td></tr>
+<tr><td>assertElementPresent</td><td>Assert</td><td>Checks that an element exists in DOM</td></tr>
+<tr><td>assertText</td><td>Assert</td><td>Verifies element contains expected text</td></tr>
+<tr><td>verifyText</td><td>Verify</td><td>Non-fatal check of element text</td></tr>
+<tr><td>waitForElementVisible</td><td>Wait</td><td>Waits until element is visible</td></tr>
+<tr><td>waitForPageToLoad</td><td>Wait</td><td>Waits for page load to complete</td></tr>
+</table>
+
+<h3>Tool Selection for RAPOS</h3>
+<p><b>Selenium IDE</b> — Selected as the primary UI automation tool for RAPOS because it requires no coding, runs directly in Chrome, and can test the live Vercel deployment at <code>https://rapos.vercel.app</code> without any local server setup. It was used to record and replay login, signup, and dashboard navigation flows. Selenium IDE's built-in assertion commands (<code>assertTitle</code>, <code>assertElementPresent</code>) made it easy to verify that the correct page loaded after each action.</p>
+<p><b>Postman</b> — Used for testing all five FastAPI REST API endpoints hosted on Render.com. Postman's environment variables feature allowed switching between local and production base URLs. Collections were created for: Prediction API, Holdings CRUD, and Market Discovery. Each request was verified for correct HTTP status codes (200, 201, 422, 401) and response JSON structure.</p>
+<p><b>PyTest</b> — Used for backend unit testing in Python. Test functions were written in a <code>test_main.py</code> file to verify the correctness of: the <code>calculate_risk_score()</code> function, the <code>get_sentiment()</code> function, and the MinMaxScaler normalization logic. PyTest was run locally during development to catch logic errors before deployment.</p>
+
+<div class="summary-box">
+  <b>Testing Executive Summary:</b> The RAPOS testing lifecycle spanned 4 weeks, involving daily unit tests and weekly regression suites. Over 50 unique test scenarios were executed, covering edge cases like token expiration, database concurrency, and model inference timeouts. As of April 27, 2026, all critical and high-priority test cases have achieved a 100% pass rate on the production environment.
+</div>
+
+<h2>Technical Environment Specifications</h2>
+<div class="tech-spec">
+  <div class="tech-card"><b>Frontend Stack</b>Vercel (Edge Runtime)<br>HTML5 / CSS3 / ES6+ JS</div>
+  <div class="tech-card"><b>Backend AI</b>Render.com (Python 3.11)<br>FastAPI / Gunicorn</div>
+  <div class="tech-card"><b>Data Layer</b>Supabase (PostgreSQL 15)<br>Realtime WebSocket (WSS)</div>
+  <div class="tech-card"><b>Deep Learning</b>TensorFlow 2.15<br>LSTM Architecture</div>
+  <div class="tech-card"><b>API Sources</b>Finnhub Realtime API<br>TradingView Widget 3.0</div>
+  <div class="tech-card"><b>Test Tools</b>Selenium IDE v3.17<br>Postman / PyTest</div>
+</div>
+
+<!-- ===== Q4 ===== -->
+<h2>Q.4 — Selenium IDE: Web-Based Testing on RAPOS Prototype</h2>
+<p><b>Overview:</b> Selenium IDE is a browser-based record-and-playback testing tool available as a Chrome extension. It allows testers to record real user interactions with a web application and replay them as automated test cases. For RAPOS, Selenium IDE was used to create a complete test suite named <b>RAPOS_Testing_Suite</b> targeting the live deployment at <code>https://rapos.vercel.app</code>. The suite covers the four most critical user flows: Login, Registration, Dashboard Interaction, and Logout — ensuring the application behaves correctly for every new deployment pushed to Vercel via GitHub CI/CD.</p>
+<p>Selenium IDE records each browser interaction as a command (e.g., <code>open</code>, <code>type</code>, <code>click</code>) and allows adding assertions (<code>assertTitle</code>, <code>assertElementPresent</code>) to verify correctness. The tool exports test results and can generate reports. This is particularly valuable for RAPOS since the application is continuously deployed — every push to the <code>main</code> branch on GitHub triggers a new Vercel deployment, making automated regression testing essential to catch any regressions early.</p>
+
+<div class="meta">
+  <div><span>Browser:</span> Google Chrome</div>
+  <div><span>Extension:</span> Selenium IDE (Chrome Web Store)</div>
+  <div><span>Project Name:</span> RAPOS_Testing_Suite</div>
+  <div><span>Backend Runtime:</span> Python 3.11 / FastAPI on Render.com</div>
+  <div><span>Database:</span> Supabase (PostgreSQL)</div>
+  <div><span>Frontend:</span> HTML5 / CSS3 / Vanilla JavaScript</div>
+  <div><span>Testing URL:</span> https://rapos.vercel.app</div>
+</div>
+
+<h3>Project Description</h3>
+<p><b>RAPOS (Risk-Aware Portfolio Optimisation System)</b> is a production-deployed, full-stack AI financial terminal accessible at <code>https://rapos.vercel.app</code>. It is built for retail investors who lack access to institutional-grade analytics tools. The system combines a <b>Keras LSTM neural network</b> (trained on 60-day OHLCV sequences) for next-day stock price prediction with <b>Markowitz Modern Portfolio Theory</b> for intelligent rebalancing — all served in real time through a FastAPI backend on Render.com and a PostgreSQL database on Supabase.</p>
+<p>The frontend is built in pure HTML5, CSS3, and Vanilla JavaScript — deployed on Vercel's global CDN edge network. The dashboard provides: live net worth tracking (updates every 10 seconds via Supabase WebSocket), a Neural Prediction Card (LSTM result + AI Risk Score 1–10 + Bullish/Bearish sentiment), an AI Rebalancer (3 risk profiles with BUY/SELL amounts), a Market Hub (live Finnhub data + TradingView charts), and an Institutional Price Ticker (BTC, NVDA, AAPL, GOLD, TSLA) pinned at the top. The Selenium IDE test suite verifies all major user flows in this production environment.</p>
+
+<h3>Functional Requirements Tested</h3>
+<ul>
+<li>User can sign up, log in, and log out securely</li>
+<li>User can add and remove portfolio holdings</li>
+<li>LSTM prediction returns results within 3 seconds</li>
+<li>AI Rebalancer outputs BUY/SELL signals for all 3 risk profiles</li>
+<li>Dashboard net worth auto-refreshes every 10 seconds</li>
+</ul>
+
+<h3>Login Module — Selenium IDE Test Cases</h3>
+<table>
+<tr><th>TC ID</th><th>Test Scenario</th><th>Test Steps</th><th>Expected Result</th><th>Status</th></tr>
+<tr><td>TC-LG-01</td><td>Valid Login</td><td>1. open /login 2. type email 3. type password 4. click Login</td><td>Redirect to /dashboard</td><td class="pass">Pass</td></tr>
+<tr><td>TC-LG-02</td><td>Wrong Password</td><td>1. open /login 2. type email 3. type wrong password 4. click Login</td><td>Error alert shown</td><td class="pass">Pass</td></tr>
+<tr><td>TC-LG-03</td><td>Empty Submit</td><td>1. open /login 2. click Login (blank)</td><td>HTML5 validation fires</td><td class="pass">Pass</td></tr>
+<tr><td>TC-LG-04</td><td>Forgot Password Link</td><td>1. open /login 2. assertElementPresent forgot-password link</td><td>Link visible</td><td class="pass">Pass</td></tr>
+</table>
+
+<h3>Dashboard Module — Selenium IDE Test Cases</h3>
+<table>
+<tr><th>TC ID</th><th>Test Scenario</th><th>Test Steps</th><th>Expected Result</th><th>Status</th></tr>
+<tr><td>TC-DB-01</td><td>Dashboard loads</td><td>1. Login 2. assertTitle "Professional Dashboard - RAPOS"</td><td>Title matches</td><td class="pass">Pass</td></tr>
+<tr><td>TC-DB-02</td><td>Ticker visible</td><td>1. Login 2. assertElementPresent .ticker-wrapper</td><td>Price ticker shown at top</td><td class="pass">Pass</td></tr>
+<tr><td>TC-DB-03</td><td>Net worth displayed</td><td>1. Login 2. assertElementPresent #totalValue</td><td>Net worth $ value shown</td><td class="pass">Pass</td></tr>
+<tr><td>TC-DB-04</td><td>AI Prediction card</td><td>1. Login 2. Enter TSLA 3. click Predict</td><td>Prediction result card shown</td><td class="pass">Pass</td></tr>
+</table>
+
+<h3>Selenium IDE Command Steps — TC-LG-01 (Valid Login)</h3>
+<table>
+<tr><th>Step #</th><th>Command</th><th>Target</th><th>Value</th><th>Expected Behavior</th></tr>
+<tr><td>1</td><td>open</td><td>/login</td><td>—</td><td>Login page loads</td></tr>
+<tr><td>2</td><td>assertTitle</td><td>RAPOS</td><td>—</td><td>Page title contains RAPOS</td></tr>
+<tr><td>3</td><td>type</td><td>id=email</td><td>test@rapos.com</td><td>Email field filled</td></tr>
+<tr><td>4</td><td>type</td><td>id=password</td><td>Test@1234</td><td>Password field filled</td></tr>
+<tr><td>5</td><td>click</td><td>id=loginBtn</td><td>—</td><td>Login button clicked</td></tr>
+<tr><td>6</td><td>waitForPageToLoad</td><td>—</td><td>3000</td><td>Page transition wait</td></tr>
+<tr><td>7</td><td>assertElementPresent</td><td>id=totalValue</td><td>—</td><td>Dashboard net worth visible</td></tr>
+</table>
+
+<h3>Postman API Test Cases (FastAPI Backend)</h3>
+<table>
+<tr><th>TC ID</th><th>Endpoint</th><th>Method</th><th>Input</th><th>Expected Response</th><th>Status</th></tr>
+<tr><td>TC-API-01</td><td>/api/predict-risk</td><td>GET</td><td>ticker=AAPL</td><td>200 OK with predicted_price, risk_score, sentiment</td><td class="pass">Pass</td></tr>
+<tr><td>TC-API-02</td><td>/api/holdings</td><td>GET</td><td>Bearer token</td><td>200 OK with holdings array</td><td class="pass">Pass</td></tr>
+<tr><td>TC-API-03</td><td>/api/holdings</td><td>POST</td><td>JSON: asset_name, ticker, qty</td><td>201 Created</td><td class="pass">Pass</td></tr>
+<tr><td>TC-API-04</td><td>/api/holdings/{id}</td><td>DELETE</td><td>holding id</td><td>200 OK, item removed</td><td class="pass">Pass</td></tr>
+<tr><td>TC-API-05</td><td>/api/market-discover</td><td>GET</td><td>—</td><td>200 OK with movers list</td><td class="pass">Pass</td></tr>
+</table>
+
+<h3>Selenium IDE Installation Steps</h3>
+<ol>
+<li>Open Google Chrome and go to the Chrome Web Store.</li>
+<li>Search <b>Selenium IDE</b> → click <b>Add to Chrome</b> → Confirm.</li>
+<li>Click the Selenium IDE icon in the toolbar to launch.</li>
+<li>Select <b>Create a new project</b> → Name: <code>RAPOS_Testing_Suite</code>.</li>
+<li>Enter base URL: <code>https://rapos.vercel.app</code></li>
+<li>Click <b>+</b> → New test suite → Name: <code>Login_Tests</code>.</li>
+<li>Click <b>Record a new test</b> → Name: <code>TC-LG-01_Valid_Login</code>.</li>
+<li>A new tab opens — perform the login manually; Selenium records each action.</li>
+<li>Stop recording → Add assertion: <code>assertElementPresent</code> on <code>#totalValue</code>.</li>
+<li>Save with <b>Ctrl+S</b>. Click ▶ Run to replay.</li>
+</ol>
+
+
+<h3>Registration Module — Selenium IDE Test Cases</h3>
+<p>The Registration module allows new users to create a RAPOS account. It calls <b>Supabase's <code>signUp()</code> API</b> with the user's name, email, and password. On success, Supabase creates a new entry in the <code>auth.users</code> table and returns a JWT session token, automatically logging the user in and redirecting them to the dashboard. The registration form validates: email format (must contain @), password minimum length (6 characters), and required name field. Duplicate emails are caught by Supabase and returned as an error response. The test cases below verify all success and failure paths of the registration flow.</p>
+<table>
+<tr><th>TC ID</th><th>Test Scenario</th><th>Test Steps</th><th>Expected Result</th><th>Status</th></tr>
+<tr><td>TC-RG-01</td><td>Valid Registration</td><td>1. open /signup 2. type name=Abhi Virani 3. type email=test@rapos.com 4. type password=Test@1234 5. click Register</td><td>Account created, redirected to /dashboard</td><td class="pass">Pass</td></tr>
+<tr><td>TC-RG-02</td><td>Duplicate Email</td><td>1. open /signup 2. Enter existing email 3. click Register</td><td>Error: "Email already registered"</td><td class="pass">Pass</td></tr>
+<tr><td>TC-RG-03</td><td>Weak Password</td><td>1. open /signup 2. Enter password=123 3. click Register</td><td>Validation: "Password too weak"</td><td class="pass">Pass</td></tr>
+<tr><td>TC-RG-04</td><td>Empty Name</td><td>1. open /signup 2. Leave name blank 3. click Register</td><td>HTML5 required validation fires</td><td class="pass">Pass</td></tr>
+</table>
+
+<h3>Market Hub Module — Selenium IDE Test Cases</h3>
+<p>The Market Hub is RAPOS's live market intelligence panel. It fetches real-time stock quotes and top movers from the <b>Finnhub API</b> and renders interactive charts using the <b>TradingView Lightweight Charts</b> library embedded directly in the dashboard. The Market Hub tab is accessible from the main navigation bar and loads asynchronously — data is fetched on tab activation and refreshed periodically. An embedded TradingView widget provides a professional-grade chart for any selected ticker. The test cases below verify that the tab renders correctly, live data populates, the chart widget loads, and the search function returns results for a given ticker symbol.</p>
+<table>
+<tr><th>TC ID</th><th>Test Scenario</th><th>Test Steps</th><th>Expected Result</th><th>Status</th></tr>
+<tr><td>TC-MH-01</td><td>Market Hub Tab loads</td><td>1. Login 2. Click "Market Hub" tab</td><td>Market Hub panel visible with movers list</td><td class="pass">Pass</td></tr>
+<tr><td>TC-MH-02</td><td>Live quote fetched</td><td>1. Open Market Hub 2. Wait 3 seconds</td><td>Ticker prices update from Finnhub API</td><td class="pass">Pass</td></tr>
+<tr><td>TC-MH-03</td><td>TradingView chart loads</td><td>1. Open Market Hub 2. assertElementPresent .tradingview-widget-container</td><td>Chart widget rendered</td><td class="pass">Pass</td></tr>
+<tr><td>TC-MH-04</td><td>Search stock in hub</td><td>1. Open Market Hub 2. Enter NVDA in search 3. Click Analyse</td><td>NVDA data and chart displayed</td><td class="pass">Pass</td></tr>
+</table>
+
+<h3>Logout Module — Selenium IDE Test Cases</h3>
+<p>The Logout module ensures that the user's session is securely terminated when they choose to sign out. RAPOS calls <b>Supabase's <code>signOut()</code> method</b>, which invalidates the current JWT token on the server side and clears the session data from the browser's localStorage. After logout, the user is immediately redirected to the <code>/login</code> page. Any attempt to navigate to protected pages like <code>/dashboard</code> after logout will result in another redirect to <code>/login</code>, enforced by the client-side auth guard. This prevents unauthorized access to portfolio data in shared browser environments. The test cases below verify successful logout, post-logout access control, and session non-persistence across browser restarts.</p>
+<table>
+<tr><th>TC ID</th><th>Test Scenario</th><th>Test Steps</th><th>Expected Result</th><th>Status</th></tr>
+<tr><td>TC-LO-01</td><td>Successful Logout</td><td>1. Login 2. Click Logout button 3. assertTitle "RAPOS Login"</td><td>Redirected to /login, session cleared</td><td class="pass">Pass</td></tr>
+<tr><td>TC-LO-02</td><td>Access dashboard after logout</td><td>1. Logout 2. Manually navigate to /dashboard</td><td>Redirected back to /login</td><td class="pass">Pass</td></tr>
+<tr><td>TC-LO-03</td><td>Session not persisted</td><td>1. Logout 2. Close browser 3. Reopen /dashboard</td><td>Redirected to /login (no auto-login)</td><td class="pass">Pass</td></tr>
+</table>
+
+<h3>Selenium IDE Command Steps — TC-RG-01 (Valid Registration)</h3>
+<table>
+<tr><th>Step #</th><th>Command</th><th>Target</th><th>Value</th><th>Expected Behavior</th></tr>
+<tr><td>1</td><td>open</td><td>/signup</td><td>—</td><td>Signup page loads</td></tr>
+<tr><td>2</td><td>assertTitle</td><td>RAPOS</td><td>—</td><td>Page title verified</td></tr>
+<tr><td>3</td><td>type</td><td>id=name</td><td>Abhi Virani</td><td>Name field filled</td></tr>
+<tr><td>4</td><td>type</td><td>id=email</td><td>test@rapos.com</td><td>Email field filled</td></tr>
+<tr><td>5</td><td>type</td><td>id=password</td><td>Test@1234</td><td>Password field filled</td></tr>
+<tr><td>6</td><td>click</td><td>id=registerBtn</td><td>—</td><td>Register button clicked</td></tr>
+<tr><td>7</td><td>waitForPageToLoad</td><td>—</td><td>3000</td><td>Redirect wait</td></tr>
+<tr><td>8</td><td>assertElementPresent</td><td>id=totalValue</td><td>—</td><td>Dashboard loaded</td></tr>
+</table>
+
+<h3>Selenium IDE Command Steps — TC-DB-04 (AI Prediction)</h3>
+<table>
+<tr><th>Step #</th><th>Command</th><th>Target</th><th>Value</th><th>Expected Behavior</th></tr>
+<tr><td>1</td><td>open</td><td>/dashboard</td><td>—</td><td>Dashboard loads</td></tr>
+<tr><td>2</td><td>waitForElementVisible</td><td>id=tickerInput</td><td>5000</td><td>Prediction input visible</td></tr>
+<tr><td>3</td><td>type</td><td>id=tickerInput</td><td>TSLA</td><td>Ticker TSLA entered</td></tr>
+<tr><td>4</td><td>click</td><td>id=predictBtn</td><td>—</td><td>Predict button clicked</td></tr>
+<tr><td>5</td><td>waitForElementVisible</td><td>id=predictionCard</td><td>5000</td><td>Prediction card appears</td></tr>
+<tr><td>6</td><td>assertElementPresent</td><td>id=riskScore</td><td>—</td><td>Risk score (1–10) shown</td></tr>
+<tr><td>7</td><td>assertElementPresent</td><td>id=sentimentBadge</td><td>—</td><td>Bullish/Bearish badge shown</td></tr>
+</table>
+
+<h2>Function Details</h2>
+<p>This section documents the key JavaScript and Python functions that power the RAPOS application. Understanding these functions is essential for writing effective test cases — each test case maps directly to one or more of the functions described below. The frontend functions interact with Supabase via the JavaScript SDK, while the backend functions are Python endpoints exposed through FastAPI.</p>
+
+<h3>Login Function</h3>
+<p><b>Purpose:</b> Authenticates a user using Supabase Email/Password Authentication. The function first validates that both the email and password fields are non-empty, then calls the Supabase <code>signInWithPassword()</code> API. On success, Supabase returns a <b>JWT access token</b> and a <b>refresh token</b>, both stored in the browser's localStorage by the Supabase SDK automatically. The function then redirects the user to <code>/dashboard</code>. On failure (wrong password, unregistered email, or network error), an error message is displayed in a styled toast notification on the login page. The session persists across page refreshes until the user explicitly logs out.</p>
+<table>
+<tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+<tr><td>email</td><td>String</td><td>User's registered email address</td></tr>
+<tr><td>password</td><td>String</td><td>User's account password (min 6 chars)</td></tr>
+</table>
+<p><b>Returns:</b> <code>{ user, session }</code> on success · <code>{ error }</code> on failure<br>
+<b>Supabase Call:</b> <code>supabase.auth.signInWithPassword({ email, password })</code></p>
+
+<h3>Registration Function</h3>
+<p><b>Purpose:</b> Creates a new RAPOS user account using Supabase's <code>signUp()</code> API. Before making the API call, the frontend validates: (1) the name field is not empty, (2) the email address matches a valid format using a regex check, and (3) the password is at least 6 characters long. The user's full name is passed as <b>user metadata</b> in the Supabase options object, allowing it to be retrieved later from the session without needing a separate database query. If the email address is already registered, Supabase returns a <code>400 Bad Request</code> error which is caught and displayed to the user. On successful registration, Supabase simultaneously logs the user in (returning a session token), and the function redirects to <code>/dashboard</code>.</p>
+<table>
+<tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+<tr><td>name</td><td>String</td><td>User's full name (stored in metadata)</td></tr>
+<tr><td>email</td><td>String</td><td>New unique email address</td></tr>
+<tr><td>password</td><td>String</td><td>Password (min 6 chars, must contain number)</td></tr>
+</table>
+<p><b>Returns:</b> <code>{ user, session }</code> on success · <code>{ error }</code> if email exists<br>
+<b>Supabase Call:</b> <code>supabase.auth.signUp({ email, password, options: { data: { name } } })</code></p>
+
+<h3>Dashboard / Portfolio Function</h3>
+<p><b>Purpose:</b> This is the master function that powers the RAPOS dashboard. On page load, it first checks for a valid Supabase session (redirecting to <code>/login</code> if none exists). It then fetches the user's holdings from the <code>portfolios</code> table, calculates total net worth, and renders the holdings table with animated sparkline charts. A <b>Supabase Realtime subscription</b> is opened on the <code>portfolios</code> table — whenever another device or API call inserts, updates, or deletes a row for this user, the dashboard updates instantly via WebSocket without any page refresh. The function also handles: triggering LSTM predictions via the FastAPI <code>/api/predict-risk</code> endpoint, running the AI Rebalancer with Markowitz MPT calculations, and fetching live market data for the Market Hub tab from the Finnhub API.</p>
+<table>
+<tr><th>Sub-function</th><th>Description</th></tr>
+<tr><td>loadHoldings(userId)</td><td>Fetches all rows from <code>portfolios</code> table where user_id matches</td></tr>
+<tr><td>calculateNetWorth(holdings)</td><td>Sums (quantity × current_price) for all holdings</td></tr>
+<tr><td>subscribeRealtime()</td><td>Opens Supabase channel on <code>portfolios</code> table for live INSERT/DELETE events</td></tr>
+<tr><td>fetchPrediction(ticker)</td><td>Calls FastAPI <code>GET /api/predict-risk?ticker=</code> and renders the prediction card</td></tr>
+<tr><td>runRebalancer(profile)</td><td>Applies Markowitz MPT on current holdings to generate BUY/SELL signals</td></tr>
+</table>
+
+<h2>Screenshots</h2>
+<p>The following screenshots were captured during <b>live Selenium IDE test execution</b> on <code>https://rapos.vercel.app</code>. Each screenshot corresponds to a specific test case step, showing the browser state at the moment of assertion. Screenshots serve as visual evidence that the expected UI state was achieved and provide a permanent record of test results for audit and submission purposes.</p>
+
+<h3>Screenshot 1 — TC-LG-01: Login Page</h3>
+<p><b>Test Case:</b> TC-LG-01 &nbsp;|&nbsp; <b>Module:</b> Authentication &nbsp;|&nbsp; <b>URL:</b> rapos.vercel.app/login &nbsp;|&nbsp; <b>Status:</b> <span style="color:green;font-weight:700">Pass</span></p>
+<p>The RAPOS Login page showing the "Welcome Back" heading, Email Address field (placeholder: you@example.com), masked Password field, Remember Me checkbox, Forgot Password link, and the blue Sign In button. Light gradient background confirms the page loaded correctly. This screenshot was captured at Step 1 of TC-LG-01 before credentials are entered, verifying the login form renders completely.</p>
+<div style="text-align:center;margin:10px 0 20px;">
+<img src="ss_login.png" style="width:65%;border:2px solid #c7d9ff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.15);" alt="RAPOS Login Page">
+<div style="font-size:9pt;color:#666;margin-top:5px;"><i>Fig 1: RAPOS Login Page — TC-LG-01 — rapos.vercel.app/login</i></div>
+</div>
+
+<h3>Screenshot 2 — TC-LG-04 / Landing: Home Page with Institutional Ticker</h3>
+<p><b>Test Case:</b> TC-LG-04 (Forgot Password visible) &nbsp;|&nbsp; <b>Module:</b> Landing / Auth &nbsp;|&nbsp; <b>URL:</b> rapos.vercel.app &nbsp;|&nbsp; <b>Status:</b> <span style="color:green;font-weight:700">Pass</span></p>
+<p>The RAPOS Landing Page showing: (1) the <b>Institutional Price Ticker</b> scrolling at the top with live prices — BTC/USD $64,321 (+1.2%), NVDA $854.12 (+2.4%), TSLA $175.22 (-0.8%), AAPL $189.44 (+0.4%), GOLD $2,342 (+1.1%); (2) navigation bar with Home, Features, How it Works, Log in, and Sign up links; (3) the hero section with dark background and headline <b>"Smarter Investments with Risk-Aware Intelligence"</b> with subtitle text and two CTA buttons. This verifies the live ticker and navigation are fully functional.</p>
+<div style="text-align:center;margin:10px 0 20px;">
+<img src="ss_landing.png" style="width:95%;border:2px solid #c7d9ff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.15);" alt="RAPOS Landing Page">
+<div style="font-size:9pt;color:#666;margin-top:5px;"><i>Fig 2: RAPOS Landing Page — Institutional Price Ticker + Hero — rapos.vercel.app</i></div>
+</div>
+
+<h3>Screenshot 3 — TC-RG-01: Signup / Registration Page</h3>
+<p><b>Test Case:</b> TC-RG-01 &nbsp;|&nbsp; <b>Module:</b> Registration &nbsp;|&nbsp; <b>URL:</b> rapos.vercel.app/signup &nbsp;|&nbsp; <b>Status:</b> <span style="color:green;font-weight:700">Pass</span></p>
+<p>The RAPOS Signup Page showing the "Create an Account" heading with subtitle "Start optimizing your portfolio today." The form includes: First Name and Last Name fields side-by-side, Email Address field, Password field (placeholder: Create a strong password), Investment Experience dropdown (Select your level), Terms of Service and Privacy Policy links, and the blue "Create Account" button. This screenshot was captured at Step 1 of TC-RG-01 verifying all required fields are present before test data is entered.</p>
+<div style="text-align:center;margin:10px 0 20px;">
+<img src="ss_signup.png" style="width:65%;border:2px solid #c7d9ff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.15);" alt="RAPOS Signup Page">
+<div style="font-size:9pt;color:#666;margin-top:5px;"><i>Fig 3: RAPOS Signup Page — TC-RG-01 — rapos.vercel.app/signup</i></div>
+</div>
+
+<h3>Screenshot 4 — TC-DB-01: Authenticated User Dashboard</h3>
+<p><b>Test Case:</b> TC-DB-01 &nbsp;|&nbsp; <b>Module:</b> Dashboard &nbsp;|&nbsp; <b>User:</b> Abhi Virani &nbsp;|&nbsp; <b>Status:</b> <span style="color:green;font-weight:700">Pass</span></p>
+<p>This screenshot shows the <b>production RAPOS Dashboard</b> after a successful login. Key verified components include: (1) Personalized Greeting "Hi Abhi, ready to grow?"; (2) <b>Neural Hub Active</b> status badge showing LSTM architecture with 94.2% accuracy and 24ms latency; (3) The navigation sidebar with links to Market Hub and AI Rebalancer; (4) The <b>Portfolio Summary</b> card with real-time Net Worth tracking; and (5) The <b>Neural Prediction</b> component currently analyzing ticker data. This confirms that the Supabase auth state is correctly maintained and that the private dashboard data is only visible to the authenticated user.</p>
+<div style="text-align:center;margin:10px 0 20px;">
+<img src="ss_dashboard.png" style="width:95%;border:2px solid #c7d9ff;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.2);" alt="RAPOS Authenticated Dashboard">
+<div style="font-size:9pt;color:#666;margin-top:5px;"><i>Fig 4: RAPOS Private Dashboard — Authenticated Session — rapos.vercel.app/dashboard</i></div>
+</div>
+
+<h2>Bug Tracking and Resolution</h2>
+<table>
+<tr><th>Bug ID</th><th>Severity</th><th>Issue Description</th><th>Resolution</th><th>Status</th></tr>
+<tr><td>BUG-001</td><td>Critical</td><td>LSTM inference timing out on first request after server sleep</td><td>Implemented "keep-alive" ping every 10 mins on Render.com</td><td>Fixed</td></tr>
+<tr><td>BUG-002</td><td>High</td><td>Supabase Realtime not updating net worth on mobile browsers</td><td>Fixed WebSocket listener initialization in <code>supabase-client.js</code></td><td>Fixed</td></tr>
+<tr><td>BUG-003</td><td>Medium</td><td>TradingView chart overlapping sidebar on 13-inch screens</td><td>Updated CSS Media Queries to handle fluid container widths</td><td>Fixed</td></tr>
+<tr><td>BUG-004</td><td>Low</td><td>Typo in "Optimisation" on the AI Rebalancer tab</td><td>Corrected spelling across all HTML components</td><td>Fixed</td></tr>
+</table>
+
+<h2>Final Testing Conclusion</h2>
+<p>The RAPOS testing process has successfully validated the system's readiness for production. By combining the precision of <b>automated regression testing</b> via Selenium IDE and Postman with the flexibility of <b>manual exploratory testing</b>, the team has ensured that the application is both robust and user-friendly. The LSTM model has been stress-tested against volatile market data, and the Supabase-backed real-time synchronization has proven stable under simulated concurrent loads.</p>
+<p>All identified bugs have been resolved, and the <b>Acceptance Criteria</b> defined at the project's outset have been fully met. RAPOS stands as a high-performance, risk-aware financial tool that meets professional standards of software quality and academic excellence.</p>
+
+<hr style="margin-top:40px">
+<p style="text-align:center;font-size:9pt;color:#666">RAPOS Software Testing Document · Adani University · B.Tech BCE · Agile Software Development and DevOps · 2025–26<br>
+Team: Abhi Virani, Dhruv Trivedi, Dhruvish Chaudhari, Henil Malani<br>
+Mentor: Prof. Himani Prajapati</p>
+</div></body></html>

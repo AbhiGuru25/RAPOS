@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
     /* Classic Variables */
@@ -93,7 +93,7 @@ p {
 /* ============================================================
    1. Classic Navigation (dashboard-classic.html & general pages)
    ============================================================ */
-nav {
+#navbar, .top-nav, nav:not(.sidebar-nav) {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -118,7 +118,7 @@ nav {
     letter-spacing: -0.5px;
 }
 
-nav ul {
+#navbar ul, .top-nav ul, nav:not(.sidebar-nav) ul {
     list-style: none;
     display: flex;
     gap: 28px;
@@ -127,7 +127,7 @@ nav ul {
     padding: 0;
 }
 
-nav a {
+#navbar a, .top-nav a, nav:not(.sidebar-nav) a {
     color: var(--text-secondary);
     text-decoration: none;
     font-weight: 600;
@@ -137,11 +137,11 @@ nav a {
     padding: 6px 0;
 }
 
-nav a:hover, nav a.active {
+#navbar a:hover, nav a:hover, #navbar a.active, nav a.active {
     color: var(--brand-primary);
 }
 
-nav a::after {
+#navbar a::after, nav:not(.sidebar-nav) a::after {
     content: '';
     position: absolute;
     width: 0;
@@ -152,7 +152,7 @@ nav a::after {
     transition: width 0.3s ease;
 }
 
-nav a:hover::after, nav a.active::after {
+#navbar a:hover::after, nav:not(.sidebar-nav) a:hover::after, #navbar a.active::after, nav:not(.sidebar-nav) a.active::after {
     width: 100%;
 }
 
@@ -295,8 +295,12 @@ nav a:hover::after, nav a.active::after {
     display: flex;
     flex-direction: column;
     position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
     height: 100vh;
     z-index: 100;
+    overflow-y: auto;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -314,6 +318,11 @@ nav a:hover::after, nav a.active::after {
 
 .sidebar-nav {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0;
+    margin: 0;
 }
 
 .sidebar-item {

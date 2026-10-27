@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://s3.tradingview.com/tv.js"></script>
 </head>
 <body>
 
@@ -229,7 +230,10 @@
 <script src="js/api.js"></script>
 <script src="js/ui.js"></script>
 <script>
-    const switchTab = (id, el) => RAPOS_UI.switchTab(id, el);
+    const switchTab = (id, el) => {
+        RAPOS_UI.switchTab(id, el);
+        if (id === 'rebalancerTab') fetchRebalanceReport();
+    };
     const closeModal = () => RAPOS_UI.closeModal();
     const handleLogout = () => RAPOS_API.logout().then(() => window.location.href = "login.html");
     let currentProfile = "Moderate";
@@ -324,9 +328,12 @@
     }
 
     async function fetchRebalanceReport() {
-        const total = RAPOS_UI.state.holdings.reduce((s,h) => s+(h.live_value||0),0);
-        if(!total) return;
-        try { const data = await RAPOS_API.fetchRebalanceReport(total, currentProfile); renderRebalanceReport(data.optimization_report); } catch(e) {}
+        const total = RAPOS_UI.state.holdings.reduce((s,h) => s+(h.live_value||0), 0);
+        const reportTotal = total > 0 ? total : 25000;
+        try {
+            const data = await RAPOS_API.fetchRebalanceReport(reportTotal, currentProfile);
+            if (data && data.optimization_report) renderRebalanceReport(data.optimization_report);
+        } catch(e) { console.error('fetchRebalanceReport error', e); }
     }
 
     function renderRebalanceReport(report) {

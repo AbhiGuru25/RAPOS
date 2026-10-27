@@ -65,31 +65,46 @@ const RAPOS_UI = {
      * View Controllers
      */
     switchTab(tabId, element) {
+        // Update active class on sidebar items
         document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-        if (element) element.classList.add('active');
+        if (element) {
+            element.classList.add('active');
+        } else {
+            // Find sidebar-item with matching onclick
+            const matching = Array.from(document.querySelectorAll('.sidebar-item')).find(el => {
+                const attr = el.getAttribute('onclick') || '';
+                return attr.includes(tabId);
+            });
+            if (matching) matching.classList.add('active');
+        }
 
+        // Hide all views instantly
         const views = document.querySelectorAll('.tab-view');
         views.forEach(v => {
-            v.style.opacity = '0';
-            setTimeout(() => { v.style.display = 'none'; }, 200);
+            v.style.display = 'none';
+            v.classList.remove('active');
         });
 
-        setTimeout(() => {
-            const activeView = document.getElementById(tabId);
-            if (!activeView) return;
+        // Show active view
+        const activeView = document.getElementById(tabId);
+        if (activeView) {
             activeView.style.display = 'block';
-            setTimeout(() => { activeView.style.opacity = '1'; }, 50);
-            this.state.activeTab = tabId;
+            activeView.classList.add('active');
+            activeView.style.opacity = '1';
+        }
+        this.state.activeTab = tabId;
 
-            if (tabId === 'marketTab') this.initTradingView();
-        }, 250);
+        // Tab-specific initializations
+        if (tabId === 'marketTab') {
+            this.initTradingView();
+        }
     },
 
     /**
      * Portfolio Rendering
      */
     updatePortfolio(holdings) {
-        this.state.holdings = holdings;
+        this.state.holdings = holdings || [];
         this.renderHoldingsList();
         this.updateStats();
         this.updateCharts();
@@ -103,8 +118,8 @@ const RAPOS_UI = {
             list.innerHTML = `
                 <div style="text-align:center; padding:60px; color:var(--slate-400);">
                     <i class="fas fa-folder-open" style="font-size:32px; margin-bottom:16px; opacity:0.5;"></i>
-                    <p style="font-weight:600;">No assets tracked yet.</p>
-                    <p style="font-size:13px;">Add assets to begin tracking.</p>
+                    <p style="font-weight:600; font-size:16px; color:var(--slate-700);">No assets currently registered.</p>
+                    <p style="font-size:13px; margin-top:4px;">Click <b>+ New Investment</b> above to track your first asset.</p>
                 </div>`;
             return;
         }
@@ -112,20 +127,20 @@ const RAPOS_UI = {
         list.innerHTML = this.state.holdings.map(h => `
             <div class="list-item animate-fade-in">
                 <div style="display:flex; align-items:center; gap:16px;">
-                    <div style="width:48px; height:48px; background:var(--slate-100); border-radius:12px; display:flex; align-items:center; justify-content:center; font-weight:800; color:var(--brand-primary); font-size:12px;">${h.ticker.substring(0,4)}</div>
+                    <div style="width:48px; height:48px; background:var(--slate-100); border-radius:12px; display:flex; align-items:center; justify-content:center; font-weight:800; color:var(--brand-primary); font-size:12px;">${(h.ticker || 'AST').substring(0,4)}</div>
                     <div>
-                        <div style="font-weight:700; color:var(--slate-900);">${h.asset_name}</div>
-                        <div style="font-size:12px; color:var(--slate-500);">${h.quantity} units @ $${(h.current_price || 0).toLocaleString()}</div>
+                        <div style="font-weight:700; color:var(--slate-900);">${h.asset_name || h.ticker}</div>
+                        <div style="font-size:12px; color:var(--slate-500);">${h.quantity || 1} units @ $${(h.current_price || 0).toLocaleString()}</div>
                     </div>
                 </div>
                 <div style="display:flex; align-items:center; gap:24px;">
                     <div style="text-align:right;">
                         <div style="font-weight:800; font-size:16px; color:var(--slate-900);">$${(h.live_value || 0).toLocaleString()}</div>
-                        <div class="stat-trend ${h.performance_pct >= 0 ? 'trend-up' : 'trend-down'}">
-                            ${h.performance_pct >= 0 ? '+' : ''}${h.performance_pct}%
+                        <div class="stat-trend ${(h.performance_pct || 0) >= 0 ? 'trend-up' : 'trend-down'}">
+                            ${(h.performance_pct || 0) >= 0 ? '+' : ''}${h.performance_pct || 0}%
                         </div>
                     </div>
-                    <button onclick="handleDeleteAsset('${h.id}')" style="background:none; border:none; color:var(--slate-300); cursor:pointer; font-size:18px; transition:color 0.2s;">
+                    <button onclick="handleDeleteAsset('${h.id}')" style="background:none; border:none; color:var(--slate-300); cursor:pointer; font-size:18px; transition:color 0.2s;" title="Delete Asset">
                         <i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
@@ -146,11 +161,11 @@ const RAPOS_UI = {
         const velocity = totalPrevVal > 0 ? (totalGain / totalPrevVal) * 100 : 0;
 
         const valEl = document.getElementById('portfolioValue');
-        if (valEl) valEl.textContent = '$' + totalVal.toLocaleString(undefined, { minimumFractionDigits: 2 });
+        if (valEl) valEl.textContent = '$' + totalVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
         const changeEl = document.getElementById('portfolioDailyChange');
         if (changeEl) {
-            changeEl.textContent = `${totalGain >= 0 ? '+' : ''}$${totalGain.toLocaleString(undefined, { minimumFractionDigits: 2 })} (${velocity.toFixed(2)}%)`;
+            changeEl.textContent = `${totalGain >= 0 ? '+' : ''}$${totalGain.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${velocity.toFixed(2)}%)`;
             changeEl.className = `stat-trend ${totalGain >= 0 ? 'trend-up' : 'trend-down'}`;
         }
 
@@ -161,9 +176,22 @@ const RAPOS_UI = {
     updateCharts() {
         if (this.state.allocationChart) {
             const groups = {};
-            this.state.holdings.forEach(h => { groups[h.asset_type] = (groups[h.asset_type] || 0) + (h.live_value || 0); });
-            this.state.allocationChart.data.labels = Object.keys(groups);
-            this.state.allocationChart.data.datasets[0].data = Object.values(groups);
+            this.state.holdings.forEach(h => { 
+                const type = h.asset_type || 'Others';
+                groups[type] = (groups[type] || 0) + (h.live_value || 0); 
+            });
+            const labels = Object.keys(groups);
+            const data = Object.values(groups);
+
+            if (labels.length === 0) {
+                this.state.allocationChart.data.labels = ['Empty Portfolio'];
+                this.state.allocationChart.data.datasets[0].data = [1];
+                this.state.allocationChart.data.datasets[0].backgroundColor = ['#e2e8f0'];
+            } else {
+                this.state.allocationChart.data.labels = labels;
+                this.state.allocationChart.data.datasets[0].data = data;
+                this.state.allocationChart.data.datasets[0].backgroundColor = ['#3b82f6', '#6366f1', '#10b981', '#f59e0b', '#ef4444'];
+            }
             this.state.allocationChart.update();
         }
     },
@@ -172,6 +200,7 @@ const RAPOS_UI = {
      * Intelligence Hub Rendering
      */
     renderAIPrediction(data) {
+        if (!data) return;
         const pClose = document.getElementById('predictedCloseValue');
         const pScore = document.getElementById('aiRiskScoreValue');
         const pConf  = document.getElementById('modelConfidence');
@@ -179,9 +208,9 @@ const RAPOS_UI = {
 
         if (pClose) pClose.textContent = '$' + data.predicted_next_close;
         if (pScore) pScore.textContent = data.ai_risk_score;
-        if (pConf)  pConf.textContent  = (85 + Math.random() * 10).toFixed(1) + '%';
+        if (pConf)  pConf.textContent  = (data.model_confidence || 92.4).toFixed(1) + '%';
         if (pSent) {
-            const isBull = data.predicted_daily_return_pct >= 0;
+            const isBull = (data.predicted_daily_return_pct || 0) >= 0;
             pSent.textContent = isBull ? 'Bullish' : 'Bearish';
             pSent.className = `stat-trend ${isBull ? 'trend-up' : 'trend-down'}`;
             pSent.style.background = isBull ? 'var(--success-bg)' : 'var(--danger-bg)';
@@ -194,7 +223,7 @@ const RAPOS_UI = {
         const div = document.getElementById('discoveryList');
         if (!div || !items) return;
         div.innerHTML = items.map(item => `
-            <div class="list-item" style="padding:12px 16px; cursor:pointer;">
+            <div class="list-item" style="padding:12px 16px; cursor:pointer;" onclick="document.getElementById('tickerSelector').value='${item.ticker}'; fetchAIPredictions('${item.ticker}');">
                 <div>
                     <div style="font-weight:800; font-size:15px; color:var(--slate-900);">${item.ticker}</div>
                     <div style="font-size:12px; color:var(--slate-500);">${item.name || ''}</div>
@@ -265,13 +294,38 @@ const RAPOS_UI = {
      * Market Visuals
      */
     initTradingView() {
+        const container = document.getElementById('tradingview_widget');
+        if (!container) return;
+
+        // Only initialize once
+        if (container.dataset.loaded === 'true') return;
+
         if (typeof TradingView !== 'undefined') {
+            container.innerHTML = '';
             new TradingView.widget({
-                "width": "100%", "height": "100%", "symbol": "NASDAQ:AAPL", "interval": "D",
-                "theme": "light", "container_id": "tradingview_widget",
-                "style": "3", "toolbar_bg": "#f1f5f9", "enable_publishing": false,
-                "hide_top_toolbar": true, "save_image": false
+                "autosize": true,
+                "symbol": "NASDAQ:AAPL",
+                "interval": "D",
+                "timezone": "Etc/UTC",
+                "theme": "light",
+                "style": "1",
+                "locale": "en",
+                "toolbar_bg": "#f1f5f9",
+                "enable_publishing": false,
+                "allow_symbol_change": true,
+                "container_id": "tradingview_widget"
             });
+            container.dataset.loaded = 'true';
+        } else {
+            // High-reliability embed fallback
+            container.innerHTML = `
+                <iframe 
+                    src="https://s.tradingview.com/widgetembed/?symbol=NASDAQ%3AAAPL&interval=D&symboledit=1&saveimage=0&toolbarbg=f1f5f9&studies=%5B%5D&theme=light&style=1&timezone=Etc%2FUTC" 
+                    style="width:100%; height:100%; border:none; border-radius:12px;"
+                    title="TradingView Chart">
+                </iframe>
+            `;
+            container.dataset.loaded = 'true';
         }
     }
 };

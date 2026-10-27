@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -9,6 +9,61 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://s3.tradingview.com/tv.js"></script>
+    <script>
+        // Early global switchTab definition - ensures tabs ALWAYS switch regardless of load timing
+        window.switchTab = function(tabId, element) {
+            // Update active state on sidebar items
+            document.querySelectorAll('.sidebar-item').forEach(function(i) {
+                i.classList.remove('active');
+            });
+
+            if (element && element.classList) {
+                element.classList.add('active');
+            } else {
+                var match = document.querySelector('.sidebar-item[data-tab="' + tabId + '"]');
+                if (match) match.classList.add('active');
+            }
+
+            // Hide all views
+            var views = document.querySelectorAll('.tab-view');
+            for (var i = 0; i < views.length; i++) {
+                views[i].style.display = 'none';
+                views[i].classList.remove('active');
+            }
+
+            // Show active view
+            var target = document.getElementById(tabId);
+            if (target) {
+                target.style.display = 'block';
+                target.classList.add('active');
+            }
+
+            // Tab specific loaders
+            if (tabId === 'marketTab') {
+                if (window.RAPOS_UI && typeof window.RAPOS_UI.initTradingView === 'function') {
+                    window.RAPOS_UI.initTradingView();
+                }
+            } else if (tabId === 'rebalancerTab') {
+                if (typeof window.fetchRebalanceReport === 'function') {
+                    window.fetchRebalanceReport();
+                }
+            }
+        };
+
+        // Click delegation on document for all sidebar items
+        document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('click', function(e) {
+                var item = e.target.closest('.sidebar-item');
+                if (item) {
+                    var tab = item.getAttribute('data-tab');
+                    if (tab) {
+                        e.preventDefault();
+                        window.switchTab(tab, item);
+                    }
+                }
+            });
+        });
+    </script>
 </head>
 <body>
 
@@ -37,15 +92,15 @@
         <div class="sidebar-logo">RAPOS</div>
         
         <div class="sidebar-nav">
-            <div class="sidebar-item active" onclick="switchTab('portfolioTab', this)">
+            <div class="sidebar-item active" data-tab="portfolioTab" onclick="switchTab('portfolioTab', this)">
                 <i class="fas fa-chart-line"></i>
                 <span>Intelligence</span>
             </div>
-            <div class="sidebar-item" onclick="switchTab('marketTab', this)">
+            <div class="sidebar-item" data-tab="marketTab" onclick="switchTab('marketTab', this)">
                 <i class="fas fa-globe"></i>
                 <span>Market Hub</span>
             </div>
-            <div class="sidebar-item" onclick="switchTab('rebalancerTab', this)">
+            <div class="sidebar-item" data-tab="rebalancerTab" onclick="switchTab('rebalancerTab', this)">
                 <i class="fas fa-microchip"></i>
                 <span>AI Rebalancer</span>
             </div>
@@ -171,16 +226,19 @@
         </div>
 
         <!-- Market Tab -->
-        <div id="marketTab" class="tab-view" style="display:none; transition: opacity 0.2s ease;">
-            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; height: calc(100vh - 120px);">
-                <div class="card" style="padding: 12px;">
-                    <div id="tradingview_widget" style="height: 100%;"></div>
-                </div>
-                <div class="card" style="padding: 0; display:flex; flex-direction:column;">
-                    <div class="card-title" style="padding: 24px; margin-bottom:0; border-bottom: 1px solid var(--slate-100);">
-                        Global Intelligence Feed
+        <div id="marketTab" class="tab-view" style="display:none;">
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; min-height: 600px;">
+                <div class="card" style="padding: 16px; min-height: 600px; display:flex; flex-direction:column;">
+                    <div class="card-title" style="margin-bottom:12px;">
+                        <i class="fas fa-chart-area" style="color:var(--brand-primary); margin-right:8px;"></i> Real-Time Technical Terminal
                     </div>
-                    <div id="newsFeed" style="flex:1; overflow-y:auto;">
+                    <div id="tradingview_widget" style="width: 100%; height: 530px; min-height: 500px; border-radius: 12px; overflow: hidden;"></div>
+                </div>
+                <div class="card" style="padding: 0; display:flex; flex-direction:column; min-height: 600px;">
+                    <div class="card-title" style="padding: 24px; margin-bottom:0; border-bottom: 1px solid var(--slate-100);">
+                        <i class="fas fa-newspaper" style="color:var(--brand-secondary); margin-right:8px;"></i> Global Intelligence Feed
+                    </div>
+                    <div id="newsFeed" style="flex:1; overflow-y:auto; max-height: 530px;">
                         <div style="padding:40px; text-align:center; color:var(--slate-400);">Filtering noise...</div>
                     </div>
                 </div>
@@ -188,25 +246,25 @@
         </div>
 
         <!-- Rebalancer Tab -->
-        <div id="rebalancerTab" class="tab-view" style="display:none; transition: opacity 0.2s ease;">
+        <div id="rebalancerTab" class="tab-view" style="display:none;">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
                 <div class="card">
-                    <div class="card-title">Risk Profile Optimization</div>
+                    <div class="card-title"><i class="fas fa-sliders-h" style="color:var(--brand-primary); margin-right:8px;"></i> Risk Profile Optimization</div>
                     <div style="display: flex; gap: 12px; margin-bottom: 32px;">
                         <button class="btn btn-secondary flex-1" id="risk-con" onclick="setRiskProfile('Conservative')">Conservative</button>
                         <button class="btn btn-secondary flex-1 active" id="risk-mod" onclick="setRiskProfile('Moderate')">Moderate</button>
                         <button class="btn btn-secondary flex-1" id="risk-agg" onclick="setRiskProfile('Aggressive')">Aggressive</button>
                     </div>
                     <div id="rebalanceReportList" class="list-container">
-                        <div style="padding:40px; text-align:center; color:var(--slate-400);">Generate a profile report to see shifts.</div>
+                        <div style="padding:40px; text-align:center; color:var(--slate-400);">Calculating optimal weights...</div>
                     </div>
                     <button class="btn btn-primary" onclick="executeRebalance()" style="width:100%; margin-top:24px;">
-                        Execute Structural Optimization
+                        <i class="fas fa-check-circle" style="margin-right:6px;"></i> Execute Structural Optimization
                     </button>
                 </div>
                 <div class="card">
-                    <div class="card-title">Target Model Distribution</div>
-                    <div class="chart-container" style="height: 400px;"><canvas id="targetChart"></canvas></div>
+                    <div class="card-title"><i class="fas fa-chart-pie" style="color:var(--brand-secondary); margin-right:8px;"></i> Target Model Distribution</div>
+                    <div class="chart-container" style="height: 400px; position:relative;"><canvas id="targetChart"></canvas></div>
                 </div>
             </div>
         </div>
@@ -230,12 +288,8 @@
 <script src="js/api.js"></script>
 <script src="js/ui.js"></script>
 <script>
-    const switchTab = (id, el) => {
-        RAPOS_UI.switchTab(id, el);
-        if (id === 'rebalancerTab') fetchRebalanceReport();
-    };
-    const closeModal = () => RAPOS_UI.closeModal();
-    const handleLogout = () => RAPOS_API.logout().then(() => window.location.href = "login.html");
+    window.closeModal = () => RAPOS_UI.closeModal();
+    window.handleLogout = () => RAPOS_API.logout().then(() => window.location.href = "login.html");
     let currentProfile = "Moderate";
 
     function hideLoader() {
@@ -299,11 +353,11 @@
             if (!asset.asset_name || !asset.ticker || isNaN(asset.quantity)) return;
             try { await RAPOS_API.saveAsset(asset); RAPOS_UI.closeModal(); RAPOS_UI.showToast("Asset secured."); syncTerminalData(); } catch(e) { RAPOS_UI.showToast("Failed.", "error"); }
         });
-    }
+    };
 
     window.handleDeleteAsset = async function(id) {
         if(confirm("Remove this asset?")) { try { await RAPOS_API.deleteAsset(id); RAPOS_UI.showToast("Asset removed."); syncTerminalData(); } catch(e) {} }
-    }
+    };
 
     window.exportPortfolioPDF = async function() {
         RAPOS_UI.showToast("Generating PDF...");
@@ -316,7 +370,7 @@
         RAPOS_UI.state.holdings.forEach(h => { doc.text(h.ticker + ": " + h.quantity + " units - $" + (h.live_value||0).toLocaleString(), 20, y); y += 10; });
         doc.save("RAPOS_Report_" + Date.now() + ".pdf");
         RAPOS_UI.showToast("Report downloaded.");
-    }
+    };
 
     window.setRiskProfile = function(p) {
         currentProfile = p;
@@ -325,30 +379,75 @@
         if(p==="Moderate") document.getElementById("risk-mod").classList.add("active");
         if(p==="Aggressive") document.getElementById("risk-agg").classList.add("active");
         fetchRebalanceReport();
-    }
+    };
 
-    async function fetchRebalanceReport() {
-        const total = RAPOS_UI.state.holdings.reduce((s,h) => s+(h.live_value||0), 0);
+    window.fetchRebalanceReport = async function() {
+        const total = (RAPOS_UI.state.holdings || []).reduce((s,h) => s + (h.live_value || 0), 0);
         const reportTotal = total > 0 ? total : 25000;
         try {
             const data = await RAPOS_API.fetchRebalanceReport(reportTotal, currentProfile);
             if (data && data.optimization_report) renderRebalanceReport(data.optimization_report);
         } catch(e) { console.error('fetchRebalanceReport error', e); }
-    }
+    };
 
     function renderRebalanceReport(report) {
         const list = document.getElementById("rebalanceReportList");
-        const cur = {}; RAPOS_UI.state.holdings.forEach(h => { cur[h.asset_type]=(cur[h.asset_type]||0)+(h.live_value||0); });
-        list.innerHTML = report.map(r => { const diff=r.target_value-(cur[r.asset_type]||0); return `<div class="list-item" style="padding:12px 16px;"><div><div style="font-weight:700;">${r.asset_type}</div><div style="font-size:11px;color:var(--slate-500);">Target: ${r.target_weight}</div></div><div style="font-weight:800;color:${diff>0?"var(--success)":(diff<0?"var(--danger)":"var(--slate-400))"}">${diff>0?"+":""}${Math.round(diff).toLocaleString()}</div></div>`; }).join("");
-        const labels=report.map(r=>r.asset_type); const data=report.map(r=>r.target_value);
-        if(!RAPOS_UI.state.targetChart) { RAPOS_UI.state.targetChart=new Chart(document.getElementById("targetChart"),{type:"doughnut",data:{labels,datasets:[{data,backgroundColor:["#3b82f6","#10b981","#f59e0b","#ef4444"]}]},options:{responsive:true,maintainAspectRatio:false}}); }
-        else { RAPOS_UI.state.targetChart.data.labels=labels; RAPOS_UI.state.targetChart.data.datasets[0].data=data; RAPOS_UI.state.targetChart.update(); }
+        if (!list) return;
+        const cur = {}; 
+        (RAPOS_UI.state.holdings || []).forEach(h => { cur[h.asset_type] = (cur[h.asset_type] || 0) + (h.live_value || 0); });
+        
+        list.innerHTML = report.map(r => { 
+            const currentVal = cur[r.asset_type] || 0;
+            const diff = r.target_value - currentVal; 
+            return `<div class="list-item" style="padding:14px 18px; margin-bottom:8px;">
+                <div>
+                    <div style="font-weight:700; font-size:15px; color:var(--slate-900);">${r.asset_type}</div>
+                    <div style="font-size:12px; color:var(--slate-500);">Target: <b>${r.target_weight}</b> ($${r.target_value.toLocaleString()})</div>
+                </div>
+                <div style="font-weight:800; font-size:15px; color:${diff > 0 ? 'var(--success)' : (diff < 0 ? 'var(--danger)' : 'var(--slate-400)')}">
+                    ${diff > 0 ? '+' : ''}$${Math.round(diff).toLocaleString()}
+                </div>
+            </div>`; 
+        }).join("");
+
+        const labels = report.map(r => r.asset_type);
+        const data = report.map(r => r.target_value);
+        const canvas = document.getElementById("targetChart");
+        if (canvas) {
+            if (!RAPOS_UI.state.targetChart) { 
+                RAPOS_UI.state.targetChart = new Chart(canvas, {
+                    type: "doughnut",
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true } }
+                        }
+                    }
+                }); 
+            } else { 
+                RAPOS_UI.state.targetChart.data.labels = labels; 
+                RAPOS_UI.state.targetChart.data.datasets[0].data = data; 
+                RAPOS_UI.state.targetChart.update(); 
+            }
+        }
     }
 
     window.executeRebalance = function() {
-        RAPOS_UI.showToast("Executing optimization...");
-        setTimeout(() => { RAPOS_UI.showToast("Complete. Signals dispatched."); syncTerminalData(); }, 2000);
-    }
+        RAPOS_UI.showToast("Executing optimization protocol...");
+        setTimeout(() => { 
+            RAPOS_UI.showToast("Complete. Portfolio allocation signals dispatched."); 
+            syncTerminalData(); 
+        }, 1500);
+    };
 </script>
 </body>
 </html>

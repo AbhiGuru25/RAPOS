@@ -3,18 +3,23 @@
  * Centralized logic for all data fetching and state mutations.
  */
 
-const API_BASE_URL = 'https://rapos-backend.onrender.com';
+var API_BASE_URL = window.API_BASE_URL || 'https://rapos-backend.onrender.com';
 
 const RAPOS_API = {
     /**
      * Auth & Session
      */
     async getSession() {
-        return await supabase.auth.getSession();
+        if (window.supabase && window.supabase.auth) {
+            return await window.supabase.auth.getSession();
+        }
+        return { data: { session: null } };
     },
 
     async logout() {
-        return await supabase.auth.signOut();
+        if (window.supabase && window.supabase.auth) {
+            return await window.supabase.auth.signOut();
+        }
     },
 
     /**
@@ -22,7 +27,8 @@ const RAPOS_API = {
      */
     async fetchHoldings() {
         try {
-            const { data, error } = await supabase
+            if (!window.supabase) return [];
+            const { data, error } = await window.supabase
                 .from('portfolios')
                 .select('*')
                 .order('created_at', { ascending: false });
@@ -65,7 +71,8 @@ const RAPOS_API = {
     },
 
     async saveAsset(asset) {
-        const { data, error } = await supabase
+        if (!window.supabase) return null;
+        const { data, error } = await window.supabase
             .from('portfolios')
             .insert([asset]);
         if (error) throw error;
@@ -73,7 +80,8 @@ const RAPOS_API = {
     },
 
     async deleteAsset(id) {
-        const { error } = await supabase
+        if (!window.supabase) return;
+        const { error } = await window.supabase
             .from('portfolios')
             .delete()
             .eq('id', id);
@@ -208,7 +216,8 @@ const RAPOS_API = {
     async saveDailySnapshot(userId, totalVal) {
         const today = new Date().toISOString().split('T')[0];
         try {
-            const { error } = await supabase.from('portfolio_history').upsert(
+            if (!window.supabase) return { success: false };
+            const { error } = await window.supabase.from('portfolio_history').upsert(
                 [{ user_id: userId, total_val: totalVal, recorded_at: today }],
                 { onConflict: 'user_id, recorded_at' }
             );
@@ -218,3 +227,5 @@ const RAPOS_API = {
         }
     }
 };
+
+window.RAPOS_API = RAPOS_API;

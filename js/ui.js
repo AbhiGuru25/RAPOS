@@ -1,4 +1,4 @@
-/**
+﻿/**
  * RAPOS UI Engine
  * Orchestrates all DOM updates, chart renderings, and visual state.
  */
@@ -329,3 +329,5 @@ const RAPOS_UI = {
         }
     }
 };
+
+window.RAPOS_UI = RAPOS_UI;

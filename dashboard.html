@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -301,23 +301,62 @@
     document.addEventListener("DOMContentLoaded", async function() {
         let session = null;
         try {
-            const { data } = await RAPOS_API.getSession();
-            session = data.session;
-        } catch(e) { console.error("Session failed", e); }
+            if (window.supabase && window.supabase.auth) {
+                const res = await window.supabase.auth.getSession();
+                session = res && res.data ? res.data.session : null;
+            }
+            if (!session && window.RAPOS_API && typeof window.RAPOS_API.getSession === "function") {
+                const res = await window.RAPOS_API.getSession();
+                session = res && res.data ? res.data.session : null;
+            }
+        } catch(e) { 
+            console.error("Session check error", e); 
+        }
 
-        if (!session) { hideLoader(); window.location.href = "login.html"; return; }
+        // Fallback: Check localStorage in case Supabase client is still restoring
+        if (!session) {
+            try {
+                for (let i = 0; i < localStorage.length; i++) {
+                    const k = localStorage.key(i);
+                    if (k && (k.includes("-auth-token") || k.includes("supabase.auth.token"))) {
+                        const parsed = JSON.parse(localStorage.getItem(k));
+                        if (parsed && (parsed.user || parsed.access_token)) {
+                            session = parsed;
+                            break;
+                        }
+                    }
+                }
+            } catch(e) {}
+        }
 
-        RAPOS_UI.init(session.user);
-        document.getElementById("userName").textContent = (session.user.user_metadata.full_name || "Investor").split(" ")[0];
+        if (!session) {
+            console.warn("No active session detected, redirecting to login.html");
+            hideLoader();
+            window.location.href = "login.html";
+            return;
+        }
+
+        const userObj = session.user || session;
+        if (window.RAPOS_UI && typeof window.RAPOS_UI.init === "function") {
+            window.RAPOS_UI.init(userObj);
+        }
+
+        const fullName = (userObj.user_metadata && userObj.user_metadata.full_name) 
+            ? userObj.user_metadata.full_name 
+            : (userObj.email ? userObj.email.split("@")[0] : "Investor");
+        const nameEl = document.getElementById("userName");
+        if (nameEl) nameEl.textContent = fullName.split(" ")[0];
 
         try { await syncTerminalData(); } catch(e) { console.error("Sync failed", e); }
 
         hideLoader();
         loadIntelligenceStreams();
 
-        supabase.channel("portfolio-updates")
-            .on("postgres_changes", { event: "*", schema: "public", table: "portfolios" }, () => syncTerminalData())
-            .subscribe();
+        if (window.supabase && typeof window.supabase.channel === "function") {
+            window.supabase.channel("portfolio-updates")
+                .on("postgres_changes", { event: "*", schema: "public", table: "portfolios" }, () => syncTerminalData())
+                .subscribe();
+        }
     });
 
     async function syncTerminalData() {

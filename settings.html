@@ -201,11 +201,11 @@
 <div class="settings-container">
     <!-- Sidebar -->
     <div class="settings-sidebar">
-        <div class="settings-item active" onclick="showSection('general')">General</div>
-        <div class="settings-item" onclick="showSection('notifications')">Notifications</div>
-        <div class="settings-item" onclick="showSection('risk')">Risk Profile</div>
-        <div class="settings-item" onclick="showSection('portfolio')">Portfolio</div>
-        <div class="settings-item" onclick="showSection('privacy')">Privacy & Security</div>
+        <div class="settings-item active" onclick="showSection('general', this)">General</div>
+        <div class="settings-item" onclick="showSection('notifications', this)">Notifications</div>
+        <div class="settings-item" onclick="showSection('risk', this)">Risk Profile</div>
+        <div class="settings-item" onclick="showSection('portfolio', this)">Portfolio</div>
+        <div class="settings-item" onclick="showSection('privacy', this)">Privacy & Security</div>
     </div>
 
     <!-- Content -->
@@ -414,18 +414,22 @@
 <script src="accessibility.js"></script>
 <script src="responsive.js"></script>
 <script>
-    function showSection(sectionId) {
-        // Hide all sections
-        document.querySelectorAll('.settings-section').forEach(sec => {
-            sec.classList.remove('active');
-        });
-        // Hide all items
-        document.querySelectorAll('.settings-item').forEach(item => {
-            item.classList.remove('active');
-        });
-        // Show selected
-        document.getElementById(sectionId).classList.add('active');
-        event.target.classList.add('active');
+    function showSection(sectionId, el) {
+        document.querySelectorAll('.settings-section').forEach(sec => sec.classList.remove('active'));
+        document.querySelectorAll('.settings-item').forEach(item => item.classList.remove('active'));
+        
+        const targetSec = document.getElementById(sectionId);
+        if (targetSec) targetSec.classList.add('active');
+        
+        if (el && el.classList) {
+            el.classList.add('active');
+        } else {
+            const match = Array.from(document.querySelectorAll('.settings-item')).find(i => {
+                const onclick = i.getAttribute('onclick') || '';
+                return onclick.includes(sectionId);
+            });
+            if (match) match.classList.add('active');
+        }
     }
 
     function toggleSwitch(btn) {

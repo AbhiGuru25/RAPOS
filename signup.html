@@ -157,7 +157,13 @@
             msg.style.background = 'var(--success-bg)';
             msg.style.color = 'var(--success)';
             
-            setTimeout(() => { window.location.href = 'login.html'; }, 2000);
+            setTimeout(() => {
+                if (data && data.session) {
+                    window.location.href = 'dashboard.html';
+                } else {
+                    window.location.href = 'login.html';
+                }
+            }, 1500);
         } catch (error) {
             btn.innerHTML = '<i class="fas fa-rocket"></i> Deploy Intelligence Node';
             btn.disabled = false;

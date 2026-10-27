@@ -12,6 +12,7 @@
     <script>
         // Early global switchTab definition - ensures tabs ALWAYS switch regardless of load timing
         window.switchTab = function(tabId, element) {
+            if (typeof window.toggleSidebar === 'function') window.toggleSidebar(false);
             // Update active state on sidebar items
             document.querySelectorAll('.sidebar-item').forEach(function(i) {
                 i.classList.remove('active');
@@ -108,6 +109,14 @@
                 <i class="fas fa-clock-rotate-left"></i>
                 <span>Terminal Classic</span>
             </div>
+            <div class="sidebar-item" onclick="window.location.href='settings.html'">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </div>
+            <div class="sidebar-item" onclick="window.location.href='profile.html'">
+                <i class="fas fa-user-circle"></i>
+                <span>Operator Profile</span>
+            </div>
         </div>
 
         <div style="padding: 24px;">
@@ -135,6 +144,17 @@
 
     <!-- Main Content -->
     <main class="main-surface">
+        <!-- Mobile Navigation Header -->
+        <div class="mobile-topbar">
+            <button class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Open Navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div style="font-family:'Outfit',sans-serif; font-weight:800; font-size:18px; color:var(--brand-primary); letter-spacing:-0.5px;">RAPOS</div>
+            <button class="mobile-menu-btn" onclick="handleLogout()" title="Logout" aria-label="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+        <div id="sidebarBackdrop" class="sidebar-backdrop" onclick="toggleSidebar(false)"></div>
         <!-- Ticker -->
         <div class="ticker-wrap" style="margin: -40px -40px 40px; width: calc(100% + 80px);">
             <div class="ticker">
@@ -314,7 +334,30 @@
 <script src="js/ui.js"></script>
 <script>
     window.closeModal = () => RAPOS_UI.closeModal();
-    window.handleLogout = () => RAPOS_API.logout().then(() => window.location.href = "login.html");
+        window.handleLogout = async () => {
+        try {
+            if (window.RAPOS_API) await RAPOS_API.logout();
+            else if (window.supabase) await window.supabase.auth.signOut();
+        } catch(e) {}
+        try {
+            for (let i = localStorage.length - 1; i >= 0; i--) {
+                const k = localStorage.key(i);
+                if (k && (k.includes('-auth-token') || k.includes('supabase'))) {
+                    localStorage.removeItem(k);
+                }
+            }
+        } catch(e) {}
+        window.location.href = "login.html";
+    };
+    window.toggleSidebar = function(force) {
+        const sidebar = document.querySelector('.sidebar');
+        const backdrop = document.getElementById('sidebarBackdrop');
+        if (!sidebar) return;
+        const isOpen = force !== undefined ? force : !sidebar.classList.contains('open');
+        sidebar.classList.toggle('open', isOpen);
+        if (backdrop) backdrop.classList.toggle('active', isOpen);
+    };
+
     let currentProfile = "Moderate";
 
     function hideLoader() {
@@ -423,17 +466,31 @@
         if(confirm("Remove this asset?")) { try { await RAPOS_API.deleteAsset(id); RAPOS_UI.showToast("Asset removed."); syncTerminalData(); } catch(e) {} }
     };
 
-    window.exportPortfolioPDF = async function() {
+        window.exportPortfolioPDF = async function() {
+        if (!window.jspdf) {
+            RAPOS_UI.showToast("PDF engine unavailable, try again shortly.", "error");
+            return;
+        }
         RAPOS_UI.showToast("Generating PDF...");
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.setFont("Helvetica","bold"); doc.setFontSize(22); doc.setTextColor(59,130,246); doc.text("RAPOS: TERMINAL REPORT", 20, 20);
-        doc.setFont("Helvetica","normal"); doc.setFontSize(10); doc.setTextColor(100,116,139); doc.text("Target: " + RAPOS_UI.state.currentUser.email, 20, 30);
-        doc.text("Timestamp: " + new Date().toLocaleString(), 20, 36);
-        let y = 50; doc.setFontSize(12); doc.setTextColor(15,23,42);
-        RAPOS_UI.state.holdings.forEach(h => { doc.text(h.ticker + ": " + h.quantity + " units - $" + (h.live_value||0).toLocaleString(), 20, y); y += 10; });
-        doc.save("RAPOS_Report_" + Date.now() + ".pdf");
-        RAPOS_UI.showToast("Report downloaded.");
+        try {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFont("Helvetica","bold"); doc.setFontSize(22); doc.setTextColor(59,130,246); doc.text("RAPOS: TERMINAL REPORT", 20, 20);
+            doc.setFont("Helvetica","normal"); doc.setFontSize(10); doc.setTextColor(100,116,139);
+            const userEmail = (RAPOS_UI.state.currentUser && RAPOS_UI.state.currentUser.email) ? RAPOS_UI.state.currentUser.email : "Authorized Operator";
+            doc.text("Target: " + userEmail, 20, 30);
+            doc.text("Timestamp: " + new Date().toLocaleString(), 20, 36);
+            let y = 50; doc.setFontSize(12); doc.setTextColor(15,23,42);
+            (RAPOS_UI.state.holdings || []).forEach(h => {
+                doc.text((h.ticker || 'ASSET') + ": " + (h.quantity || 1) + " units - $" + (h.live_value || 0).toLocaleString(), 20, y);
+                y += 10;
+            });
+            doc.save("RAPOS_Report_" + Date.now() + ".pdf");
+            RAPOS_UI.showToast("Report downloaded.");
+        } catch(e) {
+            console.error("PDF export error", e);
+            RAPOS_UI.showToast("Failed to generate PDF.", "error");
+        }
     };
 
     window.setRiskProfile = function(p) {

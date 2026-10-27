@@ -35,5 +35,11 @@ CREATE POLICY "Users can update their own portfolios"
 ON public.portfolios FOR UPDATE 
 USING (auth.uid() = user_id);
 
+
+-- Users can only delete their own portfolios
+CREATE POLICY "Users can delete their own portfolios" 
+ON public.portfolios FOR DELETE 
+USING (auth.uid() = user_id);
+
 -- 4. Seed some sample data (Optional)
 -- Note: You can add sample data through the Table Editor in Supabase

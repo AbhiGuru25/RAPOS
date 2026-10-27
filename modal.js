@@ -123,13 +123,16 @@ class Modal {
         });
     }
 
-    alert(title, message) {
+        alert(title, message) {
         return new Promise((resolve) => {
             document.getElementById('modalHeader').textContent = title;
             document.getElementById('modalBody').textContent = message;
-            document.getElementById('modalFooter').innerHTML = `
-                <button class="modal-btn modal-btn-primary" onclick="modal.close(); resolve();">OK</button>
-            `;
+            const footer = document.getElementById('modalFooter');
+            footer.innerHTML = '<button class="modal-btn modal-btn-primary" id="modalOkBtn">OK</button>';
+            document.getElementById('modalOkBtn').onclick = () => {
+                this.close();
+                resolve();
+            };
             document.getElementById('modal').classList.add('active');
         });
     }
@@ -138,10 +141,16 @@ class Modal {
         return new Promise((resolve) => {
             document.getElementById('modalHeader').textContent = title;
             document.getElementById('modalBody').textContent = message;
-            document.getElementById('modalFooter').innerHTML = `
-                <button class="modal-btn modal-btn-secondary" onclick="modal.close(); resolve(false);">Cancel</button>
-                <button class="modal-btn modal-btn-primary" onclick="modal.close(); resolve(true);">Confirm</button>
-            `;
+            const footer = document.getElementById('modalFooter');
+            footer.innerHTML = '<button class="modal-btn modal-btn-secondary" id="modalCancelBtn">Cancel</button><button class="modal-btn modal-btn-primary" id="modalConfirmBtn">Confirm</button>';
+            document.getElementById('modalCancelBtn').onclick = () => {
+                this.close();
+                resolve(false);
+            };
+            document.getElementById('modalConfirmBtn').onclick = () => {
+                this.close();
+                resolve(true);
+            };
             document.getElementById('modal').classList.add('active');
         });
     }

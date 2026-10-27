@@ -81,13 +81,13 @@
         <input type="email" id="email" class="input-field" placeholder="operator@rapos.cloud" required>
 
         <div style="margin-bottom: 8px; font-size: 12px; font-weight: 700; color: var(--slate-400); text-transform: uppercase; letter-spacing: 0.5px;">Access Key (Password)</div>
-        <input type="password" id="password" class="input-field" placeholder="ΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇó" required>
+        <input type="password" id="password" class="input-field" placeholder="••••••••" required>
 
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
             <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--slate-500); font-weight: 600; cursor: pointer;">
                 <input type="checkbox" style="width: auto;"> Persistent Session
             </label>
-            <a href="#" style="font-size: 13px; color: var(--brand-primary); text-decoration: none; font-weight: 700;">Reset Key?</a>
+            <a href="forgot-password.html" style="font-size: 13px; color: var(--brand-primary); text-decoration: none; font-weight: 700;">Reset Key?</a>
         </div>
 
         <button type="submit" class="btn btn-primary" id="loginBtn" style="width: 100%; padding: 14px; font-size: 16px;">
@@ -103,6 +103,18 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-client.js"></script>
 <script>
+    // Auto-redirect if session already active
+    document.addEventListener("DOMContentLoaded", async () => {
+        try {
+            if (window.supabase && window.supabase.auth) {
+                const { data: { session } } = await window.supabase.auth.getSession();
+                if (session && session.user) {
+                    window.location.href = 'dashboard.html';
+                }
+            }
+        } catch(e) {}
+    });
+
     async function handleLogin() {
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;

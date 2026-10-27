@@ -221,9 +221,10 @@
     <div class="logo">RAPOS</div>
     <ul>
         <li><a href="index.html">Home</a></li>
-        <li><a href="#" class="active">Dashboard</a></li>
-        <li><a href="#" onclick="showToast('Advanced Analytics requires a Pro Subscription.')">Analytics</a></li>
-        <li><a href="#" onclick="showModal('Settings', '<p>User profile settings are currently being integrated with the secure backend. Check back soon!</p>')">Settings</a></li>
+        <li><a href="dashboard.html">Modern Terminal</a></li>
+        <li><a href="settings.html">Settings</a></li>
+        <li><a href="profile.html">Profile</a></li>
+        <li><a href="#" onclick="logout()" class="btn btn-secondary" style="padding: 6px 14px; font-size: 13px;">Log Out</a></li>
     </ul>
 </nav>
 
@@ -286,7 +287,7 @@
     <!-- AI Risk Analysis (from Backend) -->
     <div class="portfolio-section reveal" id="aiAnalysisSection">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-            <div class="section-title" style="margin-bottom: 0;">Î“Â£Â¿ Deep Learning Insights</div>
+            <div class="section-title" style="margin-bottom: 0;"><i class="fas fa-brain" style="color:var(--accent-primary); margin-right:8px;"></i> Deep Learning Insights</div>
             <select id="tickerSelector" style="width: auto; padding: 8px 16px;" onchange="fetchAIPredictions(this.value)">
                 <option value="SPXX">S&P 500 Index (SPXX)</option>
                 <option value="TECH">Technology Basket (TECH)</option>
@@ -367,22 +368,46 @@
 <script src="supabase-client.js"></script>
 
 <script>
-    // Global state for dynamic data
+    var API_BASE_URL = window.API_BASE_URL || 'https://rapos-backend.onrender.com';
     let myHoldings = [];
     let allocationChart;
     let currentUser = null;
 
-    // Auth & Protection logic
+    // Robust Auth & Protection logic
     document.addEventListener("DOMContentLoaded", async function() {
-        const { data: { session } } = await supabase.auth.getSession();
-        
+        let session = null;
+        try {
+            if (window.supabase && window.supabase.auth) {
+                const res = await window.supabase.auth.getSession();
+                session = res && res.data ? res.data.session : null;
+            }
+        } catch(e) {
+            console.warn("Classic session check error", e);
+        }
+
+        // Fallback: Check localStorage in case Supabase client is hydrating
+        if (!session) {
+            try {
+                for (let i = 0; i < localStorage.length; i++) {
+                    const k = localStorage.key(i);
+                    if (k && (k.includes("-auth-token") || k.includes("supabase.auth.token"))) {
+                        const parsed = JSON.parse(localStorage.getItem(k));
+                        if (parsed && (parsed.user || parsed.access_token)) {
+                            session = parsed;
+                            break;
+                        }
+                    }
+                }
+            } catch(e) {}
+        }
+
         if (!session) {
             window.location.href = 'login.html';
             return;
         }
 
-        currentUser = session.user;
-        updateUIWithUser(session.user);
+        currentUser = session.user || session;
+        updateUIWithUser(currentUser);
         
         // Listen for auth changes (e.g. sign out from another tab)
         supabase.auth.onAuthStateChange((event, session) => {
@@ -395,7 +420,7 @@
         // Initial AI prediction fetch
         fetchAIPredictions();
 
-        // â‰¡Æ’ÃœÃ‡ Fetch real cloud-saved holdings
+        // Fetch real cloud-saved holdings
         fetchHoldings();
 
         // --- Real-time Pulse: Refresh every 10 seconds for Viva ---
@@ -424,8 +449,8 @@
 
             const baseHoldings = data || [];
             
-            // â‰¡Æ’ÃœÃ‡ Enrich with Real-Time Prices
-            showToast('Fetching live market prices...', 1500);
+            // Enrich with Real-Time Prices
+            // Live price enrich
             
             const enrichPromises = baseHoldings.map(async (asset) => {
                 try {
@@ -547,7 +572,9 @@
     }
 
     function updateUIWithUser(user) {
-        const fullName = user.user_metadata.full_name || "Investor";
+        const fullName = (user && user.user_metadata && user.user_metadata.full_name) 
+            ? user.user_metadata.full_name 
+            : (user && user.email ? user.email.split('@')[0] : "Investor");
         document.getElementById('userName').textContent = fullName.split(' ')[0];
     }
 
@@ -658,7 +685,7 @@
                 returnEl.style.color = ret > 0 ? '#10b981' : '#ef4444';
 
                 document.getElementById('aiRiskScoreValue').textContent = data.ai_risk_score;
-                document.getElementById('aiMessage').textContent = 'Î“Â£Ã  Analysis Complete: ' + (data.is_simulated ? 'Using baseline predictions.' : 'Real-time LSTM output active.');
+                document.getElementById('aiMessage').textContent = '✅ Analysis Complete: ' + (data.is_simulated ? 'Using baseline predictions.' : 'Real-time LSTM output active.');
             } else {
                 throw new Error('API Offline');
             }
@@ -668,7 +695,7 @@
             document.getElementById('predictedCloseValue').textContent = '$142.50';
             document.getElementById('predictedReturnValue').textContent = '+0.45%';
             document.getElementById('aiRiskScoreValue').textContent = '5.2';
-            document.getElementById('aiMessage').innerHTML = '<span style="color:#64748b">â‰¡Æ’Ã´Ã­ Connect to AI Service (main.py) for live neural insights.</span>';
+            document.getElementById('aiMessage').innerHTML = '<span style="color:#64748b">Connect to AI Service (main.py) for live neural insights.</span>';
         }
     }
 
@@ -799,7 +826,7 @@
             if (error) throw error;
 
             closeModal();
-            showToast('Î“Â£Ã  Live tracking enabled!');
+            showToast('✅ Live tracking enabled!');
             fetchHoldings(); 
         } catch (error) {
             console.error('Error saving asset:', error);
@@ -818,7 +845,7 @@
                 .eq('id', id);
 
             if (error) throw error;
-            showToast('Î“Â£Ã  Asset removed.');
+            showToast('✅ Asset removed.');
             fetchHoldings();
         } catch (error) {
             console.error('Error deleting asset:', error);
@@ -829,7 +856,7 @@
     function simulateExport() {
         showToast('Preparing institutional report...');
         setTimeout(() => {
-            showToast('Î“Â£Ã  Report generated successfully.');
+            showToast('✅ Report generated successfully.');
         }, 2000);
     }
 
@@ -866,12 +893,20 @@
 
     async function logout() {
         showToast('Logging out securely...');
-        const { error } = await supabase.auth.signOut();
-        if (!error) {
-            setTimeout(() => {
-                window.location.href = 'login.html';
-            }, 800);
-        }
+        try {
+            if (window.supabase) await supabase.auth.signOut();
+        } catch(e) {}
+        try {
+            for (let i = localStorage.length - 1; i >= 0; i--) {
+                const k = localStorage.key(i);
+                if (k && (k.includes('-auth-token') || k.includes('supabase'))) {
+                    localStorage.removeItem(k);
+                }
+            }
+        } catch(e) {}
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 600);
     }
 </script>
 </body>

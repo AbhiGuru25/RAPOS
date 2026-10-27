@@ -11,13 +11,19 @@
 </head>
 <body>
 
-<div id="vivaLoader" class="modal-overlay" style="background: var(--slate-900); z-index: 10000;">
-    <div style="text-align: center; color: white;">
-        <div class="sidebar-logo" style="padding: 0; margin-bottom: 24px; font-size: 32px;">RAPOS</div>
-        <div style="width: 40px; height: 40px; border: 3px solid var(--slate-700); border-top-color: var(--brand-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 24px;"></div>
-        <p style="font-family: 'Outfit'; font-weight: 500; letter-spacing: 1px; color: var(--slate-400);">WAKING NEURAL NODE...</p>
+<div id="vivaLoader" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#f8fafc;display:flex;align-items:center;justify-content:center;z-index:10000;">
+    <div style="text-align:center;">
+        <div style="font-size:28px;font-weight:900;letter-spacing:3px;color:#1e40af;margin-bottom:20px;">RAPOS</div>
+        <div style="width:36px;height:36px;border:3px solid #e2e8f0;border-top-color:#3b82f6;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;"></div>
+        <p style="font-size:12px;font-weight:600;color:#94a3b8;letter-spacing:1px;">Loading dashboard...</p>
     </div>
 </div>
+<script>
+    window._loaderTimer = setTimeout(function() {
+        var l = document.getElementById("vivaLoader");
+        if (l) l.style.display = "none";
+    }, 5000);
+</script>
 
 <div id="toast" style="position:fixed; bottom:32px; left:50%; transform:translateX(-50%); background:var(--slate-900); color:white; padding:12px 24px; border-radius:12px; font-size:14px; font-weight:600; display:none; z-index:9999; box-shadow:var(--shadow-float); align-items:center; gap:12px; transition: opacity 0.3s ease;">
     <i class="fas fa-info-circle" style="color:var(--brand-primary);"></i>
@@ -223,42 +229,33 @@
 <script src="js/api.js"></script>
 <script src="js/ui.js"></script>
 <script>
-    /**
-     * RAPOS Terminal Controller
-     * Coordinates between API and UI layers.
-     */
-    
-    // Global switchers for UI to call
+<script>
     const switchTab = (id, el) => RAPOS_UI.switchTab(id, el);
     const closeModal = () => RAPOS_UI.closeModal();
-    const handleLogout = () => RAPOS_API.logout().then(() => window.location.href = 'login.html');
+    const handleLogout = () => RAPOS_API.logout().then(() => window.location.href = "login.html");
+    let currentProfile = "Moderate";
 
-    let currentProfile = 'Moderate';
+    function hideLoader() {
+        clearTimeout(window._loaderTimer);
+        var l = document.getElementById("vivaLoader");
+        if (l) l.style.display = "none";
+    }
 
     document.addEventListener("DOMContentLoaded", async function() {
-    document.addEventListener("DOMContentLoaded", async function() {
-        // SAFETY TIMEOUT: Force-hide the loader after 5s no matter what
-        const safetyTimer = setTimeout(() => {
-            const loader = document.getElementById("vivaLoader");
-            if (loader) loader.style.display = "none";
-        }, 5000);
-
         let session = null;
         try {
             const { data } = await RAPOS_API.getSession();
             session = data.session;
-        } catch(e) { console.error("Session fetch failed", e); }
+        } catch(e) { console.error("Session failed", e); }
 
-        if (!session) { clearTimeout(safetyTimer); window.location.href = "login.html"; return; }
+        if (!session) { hideLoader(); window.location.href = "login.html"; return; }
 
         RAPOS_UI.init(session.user);
         document.getElementById("userName").textContent = (session.user.user_metadata.full_name || "Investor").split(" ")[0];
 
         try { await syncTerminalData(); } catch(e) { console.error("Sync failed", e); }
 
-        clearTimeout(safetyTimer);
-        document.getElementById("vivaLoader").style.display = "none";
-
+        hideLoader();
         loadIntelligenceStreams();
 
         supabase.channel("portfolio-updates")
@@ -267,167 +264,85 @@
     });
 
     async function syncTerminalData() {
-        try {
-            const holdings = await RAPOS_API.fetchHoldings();
-            RAPOS_UI.updatePortfolio(holdings);
-            
-            // Update Predictions if ticker selected
-            const ticker = document.getElementById('tickerSelector').value;
-            fetchAIPredictions(ticker);
-        } catch (e) {
-            console.error("Sync failed", e);
-        }
+        const holdings = await RAPOS_API.fetchHoldings();
+        RAPOS_UI.updatePortfolio(holdings);
+        fetchAIPredictions(document.getElementById("tickerSelector").value);
     }
 
     async function fetchAIPredictions(ticker) {
-        try {
-            const data = await RAPOS_API.fetchAIPredictions(ticker);
-            RAPOS_UI.renderAIPrediction(data);
-        } catch (e) { RAPOS_UI.showToast("Prediction Engine Timeout", "error"); }
+        try { const data = await RAPOS_API.fetchAIPredictions(ticker); RAPOS_UI.renderAIPrediction(data); } catch(e) {}
     }
 
     async function loadIntelligenceStreams() {
         try {
-            const [discover, news] = await Promise.all([
-                RAPOS_API.fetchMarketDiscover(),
-                RAPOS_API.fetchNews()
-            ]);
-            
-            // Render Discovery
-            const discList = document.getElementById('discoveryList');
-            if (discList) discList.innerHTML = (discover.discovery || []).map(item => `
-                <div class="list-item" style="padding:12px 16px;">
-                    <div style="font-weight:800; color:var(--slate-900);">${item.ticker}</div>
-                    <div class="stat-trend ${item.change >= 0 ? 'trend-up' : 'trend-down'}">${item.change >= 0 ? '+' : ''}${item.change}%</div>
-                </div>
-            `).join('');
-
-            // Render News
+            const [discover, news] = await Promise.all([RAPOS_API.fetchMarketDiscover(), RAPOS_API.fetchNews()]);
+            RAPOS_UI.renderDiscovery(discover.discovery);
             RAPOS_UI.renderNews(news.news);
-        } catch (e) {
-            console.error("Intelligence stream failed", e);
-        }
+        } catch(e) { console.error("Intelligence stream failed", e); }
     }
 
-    // --- Action Handlers ---
-
     window.showTradeModal = function() {
-        RAPOS_UI.showModal('Initialize New Asset', `
-            <div style="display:flex; flex-direction:column; gap:16px;">
-                <div>
-                    <div style="margin-bottom:8px; font-size:11px; font-weight:700; color:var(--slate-400); text-transform:uppercase;">Asset Identity</div>
-                    <input id="addAssetName" type="text" class="input-field" placeholder="e.g. Nvidia Corporation" style="margin-bottom:0;">
-                </div>
-                <div>
-                    <div style="margin-bottom:8px; font-size:11px; font-weight:700; color:var(--slate-400); text-transform:uppercase;">Ticker Symbol</div>
-                    <input id="addTicker" type="text" class="input-field" placeholder="e.g. NVDA" style="margin-bottom:0;">
-                </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-                    <div>
-                        <div style="margin-bottom:8px; font-size:11px; font-weight:700; color:var(--slate-400); text-transform:uppercase;">Class</div>
-                        <select id="addAssetType" class="input-field" style="margin-bottom:0;">
-                            <option value="Stocks">Stocks</option>
-                            <option value="Crypto">Crypto</option>
-                        </select>
-                    </div>
-                    <div>
-                        <div style="margin-bottom:8px; font-size:11px; font-weight:700; color:var(--slate-400); text-transform:uppercase;">Volume</div>
-                        <input id="addQuantity" type="number" step="0.01" class="input-field" placeholder="Quantity" style="margin-bottom:0;">
-                    </div>
+        RAPOS_UI.showModal("Initialize New Asset", `
+            <div style="display:flex;flex-direction:column;gap:16px;">
+                <div><div style="margin-bottom:8px;font-size:11px;font-weight:700;color:var(--slate-400);text-transform:uppercase;">Asset Name</div><input id="addAssetName" type="text" class="input-field" placeholder="e.g. Nvidia Corporation"></div>
+                <div><div style="margin-bottom:8px;font-size:11px;font-weight:700;color:var(--slate-400);text-transform:uppercase;">Ticker</div><input id="addTicker" type="text" class="input-field" placeholder="e.g. NVDA"></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                    <div><div style="margin-bottom:8px;font-size:11px;font-weight:700;color:var(--slate-400);text-transform:uppercase;">Class</div><select id="addAssetType" class="input-field"><option value="Stocks">Stocks</option><option value="Crypto">Crypto</option></select></div>
+                    <div><div style="margin-bottom:8px;font-size:11px;font-weight:700;color:var(--slate-400);text-transform:uppercase;">Quantity</div><input id="addQuantity" type="number" step="0.01" class="input-field" placeholder="Quantity"></div>
                 </div>
             </div>
-        `, 'Deploy Asset', async () => {
-            const asset = {
-                user_id: RAPOS_UI.state.currentUser.id,
-                asset_name: document.getElementById('addAssetName').value,
-                ticker: document.getElementById('addTicker').value,
-                quantity: parseFloat(document.getElementById('addQuantity').value),
-                asset_type: document.getElementById('addAssetType').value
-            };
+        `, "Deploy Asset", async () => {
+            const asset = { user_id: RAPOS_UI.state.currentUser.id, asset_name: document.getElementById("addAssetName").value, ticker: document.getElementById("addTicker").value, quantity: parseFloat(document.getElementById("addQuantity").value), asset_type: document.getElementById("addAssetType").value };
             if (!asset.asset_name || !asset.ticker || isNaN(asset.quantity)) return;
-            try {
-                await RAPOS_API.saveAsset(asset);
-                RAPOS_UI.closeModal();
-                RAPOS_UI.showToast("Asset successfully secured.");
-                syncTerminalData();
-            } catch (e) { RAPOS_UI.showToast("Deployment failed", "error"); }
+            try { await RAPOS_API.saveAsset(asset); RAPOS_UI.closeModal(); RAPOS_UI.showToast("Asset secured."); syncTerminalData(); } catch(e) { RAPOS_UI.showToast("Failed.", "error"); }
         });
     }
 
     window.handleDeleteAsset = async function(id) {
-        if(confirm('Purge this asset from terminal memory?')) {
-            try {
-                await RAPOS_API.deleteAsset(id);
-                RAPOS_UI.showToast("Asset purged.");
-                syncTerminalData();
-            } catch (e) { RAPOS_UI.showToast("Purge failed", "error"); }
-        }
+        if(confirm("Remove this asset?")) { try { await RAPOS_API.deleteAsset(id); RAPOS_UI.showToast("Asset removed."); syncTerminalData(); } catch(e) {} }
     }
 
     window.exportPortfolioPDF = async function() {
-        RAPOS_UI.showToast('Generating Institutional PDF...');
+        RAPOS_UI.showToast("Generating PDF...");
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        doc.setFont("Helvetica", "bold"); doc.setFontSize(22); doc.setTextColor(59, 130, 246); doc.text('RAPOS: TERMINAL REPORT', 20, 20);
-        doc.setFont("Helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(100, 116, 139); doc.text(`Target: ${RAPOS_UI.state.currentUser.email}`, 20, 30);
-        doc.text(`Timestamp: ${new Date().toLocaleString()}`, 20, 36);
-        let y = 50; doc.setFontSize(12); doc.setTextColor(15, 23, 42);
-        RAPOS_UI.state.holdings.forEach(h => { doc.text(`${h.ticker}: ${h.quantity} units - $${(h.live_value || 0).toLocaleString()}`, 20, y); y += 10; });
-        doc.save(`RAPOS_Intel_${Date.now()}.pdf`);
-        RAPOS_UI.showToast('Report downloaded.');
+        doc.setFont("Helvetica","bold"); doc.setFontSize(22); doc.setTextColor(59,130,246); doc.text("RAPOS: TERMINAL REPORT", 20, 20);
+        doc.setFont("Helvetica","normal"); doc.setFontSize(10); doc.setTextColor(100,116,139); doc.text("Target: " + RAPOS_UI.state.currentUser.email, 20, 30);
+        doc.text("Timestamp: " + new Date().toLocaleString(), 20, 36);
+        let y = 50; doc.setFontSize(12); doc.setTextColor(15,23,42);
+        RAPOS_UI.state.holdings.forEach(h => { doc.text(h.ticker + ": " + h.quantity + " units - $" + (h.live_value||0).toLocaleString(), 20, y); y += 10; });
+        doc.save("RAPOS_Report_" + Date.now() + ".pdf");
+        RAPOS_UI.showToast("Report downloaded.");
     }
 
-    // --- Rebalancer ---
     window.setRiskProfile = function(p) {
         currentProfile = p;
-        document.querySelectorAll('#rebalancerTab .btn-secondary').forEach(b => b.classList.remove('active'));
-        if(p === 'Conservative') document.getElementById('risk-con').classList.add('active');
-        if(p === 'Moderate') document.getElementById('risk-mod').classList.add('active');
-        if(p === 'Aggressive') document.getElementById('risk-agg').classList.add('active');
+        document.querySelectorAll("#rebalancerTab .btn-secondary").forEach(b => b.classList.remove("active"));
+        if(p==="Conservative") document.getElementById("risk-con").classList.add("active");
+        if(p==="Moderate") document.getElementById("risk-mod").classList.add("active");
+        if(p==="Aggressive") document.getElementById("risk-agg").classList.add("active");
         fetchRebalanceReport();
     }
 
     async function fetchRebalanceReport() {
-        const total = RAPOS_UI.state.holdings.reduce((sum, h) => sum + (h.live_value || 0), 0);
-        if (total === 0) return;
-        try {
-            const data = await RAPOS_API.fetchRebalanceReport(total, currentProfile);
-            renderRebalanceReport(data.optimization_report);
-        } catch (e) {}
+        const total = RAPOS_UI.state.holdings.reduce((s,h) => s+(h.live_value||0),0);
+        if(!total) return;
+        try { const data = await RAPOS_API.fetchRebalanceReport(total, currentProfile); renderRebalanceReport(data.optimization_report); } catch(e) {}
     }
 
     function renderRebalanceReport(report) {
-        const list = document.getElementById('rebalanceReportList');
-        const currentGroups = {};
-        RAPOS_UI.state.holdings.forEach(h => { currentGroups[h.asset_type] = (currentGroups[h.asset_type] || 0) + (h.live_value || 0); });
-        list.innerHTML = report.map(r => {
-            const current = currentGroups[r.asset_type] || 0;
-            const diff = r.target_value - current;
-            return `
-                <div class="list-item" style="padding:12px 16px;">
-                    <div><div style="font-weight:700; font-size:14px;">${r.asset_type}</div><div style="font-size:11px; color:var(--slate-500);">Target: ${r.target_weight}</div></div>
-                    <div style="font-weight:800; color:${diff > 0 ? 'var(--success)' : (diff < 0 ? 'var(--danger)' : 'var(--slate-400)')}">${diff > 0 ? '+' : ''}${Math.round(diff).toLocaleString()}</div>
-                </div>
-            `;
-        }).join('');
-        
-        // Update Chart
-        const labels = report.map(r => r.asset_type);
-        const data = report.map(r => r.target_value);
-        if (!RAPOS_UI.state.targetChart) {
-            RAPOS_UI.state.targetChart = new Chart(document.getElementById('targetChart'), { type:'doughnut', data:{labels, datasets:[{data, backgroundColor:['#3b82f6','#10b981','#f59e0b','#ef4444']}]}, options:{responsive:true, maintainAspectRatio:false}});
-        } else {
-            RAPOS_UI.state.targetChart.data.labels = labels;
-            RAPOS_UI.state.targetChart.data.datasets[0].data = data;
-            RAPOS_UI.state.targetChart.update();
-        }
+        const list = document.getElementById("rebalanceReportList");
+        const cur = {}; RAPOS_UI.state.holdings.forEach(h => { cur[h.asset_type]=(cur[h.asset_type]||0)+(h.live_value||0); });
+        list.innerHTML = report.map(r => { const diff=r.target_value-(cur[r.asset_type]||0); return `<div class="list-item" style="padding:12px 16px;"><div><div style="font-weight:700;">${r.asset_type}</div><div style="font-size:11px;color:var(--slate-500);">Target: ${r.target_weight}</div></div><div style="font-weight:800;color:${diff>0?"var(--success)":(diff<0?"var(--danger)":"var(--slate-400))"}">${diff>0?"+":""}${Math.round(diff).toLocaleString()}</div></div>`; }).join("");
+        const labels=report.map(r=>r.asset_type); const data=report.map(r=>r.target_value);
+        if(!RAPOS_UI.state.targetChart) { RAPOS_UI.state.targetChart=new Chart(document.getElementById("targetChart"),{type:"doughnut",data:{labels,datasets:[{data,backgroundColor:["#3b82f6","#10b981","#f59e0b","#ef4444"]}]},options:{responsive:true,maintainAspectRatio:false}}); }
+        else { RAPOS_UI.state.targetChart.data.labels=labels; RAPOS_UI.state.targetChart.data.datasets[0].data=data; RAPOS_UI.state.targetChart.update(); }
     }
 
     window.executeRebalance = function() {
-        RAPOS_UI.showToast('Executing structural optimization...');
-        setTimeout(() => { RAPOS_UI.showToast('Optimization complete. Signals dispatched.'); syncTerminalData(); }, 2000);
+        RAPOS_UI.showToast("Executing optimization...");
+        setTimeout(() => { RAPOS_UI.showToast("Complete. Signals dispatched."); syncTerminalData(); }, 2000);
     }
 </script>
 </body>
 </html>
-

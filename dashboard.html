@@ -236,28 +236,33 @@
     let currentProfile = 'Moderate';
 
     document.addEventListener("DOMContentLoaded", async function() {
-        const { data: { session } } = await RAPOS_API.getSession();
-        if (!session) { window.location.href = 'login.html'; return; }
-        
-        // Initialize UI with user context
-        RAPOS_UI.init(session.user);
-        document.getElementById('userName').textContent = (session.user.user_metadata.full_name || 'Investor').split(' ')[0];
+    document.addEventListener("DOMContentLoaded", async function() {
+        // SAFETY TIMEOUT: Force-hide the loader after 5s no matter what
+        const safetyTimer = setTimeout(() => {
+            const loader = document.getElementById("vivaLoader");
+            if (loader) loader.style.display = "none";
+        }, 5000);
 
-        // Initial Data Load
+        let session = null;
         try {
-            await syncTerminalData();
-            setTimeout(() => { document.getElementById('vivaLoader').style.display = 'none'; }, 1200);
-        } catch (e) {
-            console.error("Terminal initialization failure", e);
-            document.getElementById('vivaLoader').style.display = 'none';
-        }
+            const { data } = await RAPOS_API.getSession();
+            session = data.session;
+        } catch(e) { console.error("Session fetch failed", e); }
 
-        // Setup Secondary Streams
+        if (!session) { clearTimeout(safetyTimer); window.location.href = "login.html"; return; }
+
+        RAPOS_UI.init(session.user);
+        document.getElementById("userName").textContent = (session.user.user_metadata.full_name || "Investor").split(" ")[0];
+
+        try { await syncTerminalData(); } catch(e) { console.error("Sync failed", e); }
+
+        clearTimeout(safetyTimer);
+        document.getElementById("vivaLoader").style.display = "none";
+
         loadIntelligenceStreams();
-        
-        // Real-time Cloud Sync
-        supabase.channel('portfolio-updates')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'portfolios' }, () => syncTerminalData())
+
+        supabase.channel("portfolio-updates")
+            .on("postgres_changes", { event: "*", schema: "public", table: "portfolios" }, () => syncTerminalData())
             .subscribe();
     });
 
@@ -425,3 +430,4 @@
 </script>
 </body>
 </html>
+

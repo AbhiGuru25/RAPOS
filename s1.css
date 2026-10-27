@@ -323,10 +323,13 @@ h1, h2, h3, h4, .font-heading {
     top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(15, 23, 42, 0.6);
     backdrop-filter: blur(8px);
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     z-index: 2000;
+}
+.modal-overlay.active {
+    display: flex;
 }
 
 .modal-content {

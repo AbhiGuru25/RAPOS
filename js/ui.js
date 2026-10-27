@@ -48,14 +48,23 @@ const RAPOS_UI = {
     },
 
     setupEventListeners() {
-        // Any global UI listeners can go here
+        // Click outside modal to close
+        const overlay = document.getElementById('modalOverlay');
+        if (overlay) {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) this.closeModal();
+            });
+        }
+        // ESC key closes modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') this.closeModal();
+        });
     },
 
     /**
      * View Controllers
      */
     switchTab(tabId, element) {
-        // Tab switching logic with smooth transitions
         document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
         if (element) element.classList.add('active');
 
@@ -67,11 +76,11 @@ const RAPOS_UI = {
 
         setTimeout(() => {
             const activeView = document.getElementById(tabId);
+            if (!activeView) return;
             activeView.style.display = 'block';
             setTimeout(() => { activeView.style.opacity = '1'; }, 50);
             this.state.activeTab = tabId;
-            
-            // Trigger tab-specific loads
+
             if (tabId === 'marketTab') this.initTradingView();
         }, 250);
     },
@@ -94,8 +103,8 @@ const RAPOS_UI = {
             list.innerHTML = `
                 <div style="text-align:center; padding:60px; color:var(--slate-400);">
                     <i class="fas fa-folder-open" style="font-size:32px; margin-bottom:16px; opacity:0.5;"></i>
-                    <p style="font-weight:600;">Node is currently vacant.</p>
-                    <p style="font-size:13px;">Add assets to begin neural tracking.</p>
+                    <p style="font-weight:600;">No assets tracked yet.</p>
+                    <p style="font-size:13px;">Add assets to begin tracking.</p>
                 </div>`;
             return;
         }
@@ -165,12 +174,12 @@ const RAPOS_UI = {
     renderAIPrediction(data) {
         const pClose = document.getElementById('predictedCloseValue');
         const pScore = document.getElementById('aiRiskScoreValue');
-        const pConf = document.getElementById('modelConfidence');
-        const pSent = document.getElementById('predictedSentiment');
+        const pConf  = document.getElementById('modelConfidence');
+        const pSent  = document.getElementById('predictedSentiment');
 
         if (pClose) pClose.textContent = '$' + data.predicted_next_close;
         if (pScore) pScore.textContent = data.ai_risk_score;
-        if (pConf) pConf.textContent = (85 + Math.random() * 10).toFixed(1) + '%';
+        if (pConf)  pConf.textContent  = (85 + Math.random() * 10).toFixed(1) + '%';
         if (pSent) {
             const isBull = data.predicted_daily_return_pct >= 0;
             pSent.textContent = isBull ? 'Bullish' : 'Bearish';
@@ -181,9 +190,25 @@ const RAPOS_UI = {
         }
     },
 
+    renderDiscovery(items) {
+        const div = document.getElementById('discoveryList');
+        if (!div || !items) return;
+        div.innerHTML = items.map(item => `
+            <div class="list-item" style="padding:12px 16px; cursor:pointer;">
+                <div>
+                    <div style="font-weight:800; font-size:15px; color:var(--slate-900);">${item.ticker}</div>
+                    <div style="font-size:12px; color:var(--slate-500);">${item.name || ''}</div>
+                </div>
+                <div class="stat-trend ${item.change >= 0 ? 'trend-up' : 'trend-down'}" style="font-weight:800; font-size:14px;">
+                    ${item.change >= 0 ? '+' : ''}${item.change}%
+                </div>
+            </div>
+        `).join('');
+    },
+
     renderNews(news) {
         const div = document.getElementById('newsFeed');
-        if (!div) return;
+        if (!div || !news) return;
         div.innerHTML = news.map(item => `
             <div style="padding:20px 24px; border-bottom:1px solid var(--slate-100); cursor:pointer; transition:background 0.2s;" onclick="window.open('${item.url}', '_blank')">
                 <div style="font-size:14px; font-weight:700; color:var(--slate-800); margin-bottom:6px; line-height:1.4;">${item.headline}</div>
@@ -202,24 +227,34 @@ const RAPOS_UI = {
         document.getElementById('modalTitle').textContent = title;
         document.getElementById('modalBody').innerHTML = body;
         const btn = document.getElementById('modalConfirmBtn');
-        btn.textContent = confirmText;
-        btn.onclick = onConfirm;
-        document.getElementById('modalOverlay').style.display = 'flex';
+        if (btn) {
+            btn.textContent = confirmText || 'Confirm';
+            btn.onclick = onConfirm;
+        }
+        const overlay = document.getElementById('modalOverlay');
+        if (overlay) {
+            overlay.style.display = 'flex';
+            overlay.classList.add('active');
+        }
     },
 
     closeModal() {
-        document.getElementById('modalOverlay').style.display = 'none';
+        const overlay = document.getElementById('modalOverlay');
+        if (overlay) {
+            overlay.style.display = 'none';
+            overlay.classList.remove('active');
+        }
     },
 
     showToast(message, type = 'info') {
         const toast = document.getElementById('toast');
         const msg = document.getElementById('toastMsg');
         if (!toast || !msg) return;
-        
+
         msg.textContent = message;
         toast.style.display = 'flex';
         toast.style.opacity = '1';
-        
+
         setTimeout(() => {
             toast.style.opacity = '0';
             setTimeout(() => { toast.style.display = 'none'; }, 300);
@@ -232,8 +267,10 @@ const RAPOS_UI = {
     initTradingView() {
         if (typeof TradingView !== 'undefined') {
             new TradingView.widget({
-                "width": "100%", "height": "100%", "symbol": "NASDAQ:AAPL", "interval": "D", "theme": "light", "container_id": "tradingview_widget",
-                "style": "3", "toolbar_bg": "#f1f5f9", "enable_publishing": false, "hide_top_toolbar": true, "save_image": false
+                "width": "100%", "height": "100%", "symbol": "NASDAQ:AAPL", "interval": "D",
+                "theme": "light", "container_id": "tradingview_widget",
+                "style": "3", "toolbar_bg": "#f1f5f9", "enable_publishing": false,
+                "hide_top_toolbar": true, "save_image": false
             });
         }
     }

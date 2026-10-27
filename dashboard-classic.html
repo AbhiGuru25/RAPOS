@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -294,7 +294,7 @@
     <!-- AI Risk Analysis (from Backend) -->
     <div class="portfolio-section reveal" id="aiAnalysisSection">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-            <div class="section-title" style="margin-bottom: 0;">Γ£¿ Deep Learning Insights</div>
+            <div class="section-title" style="margin-bottom: 0;">Î“Â£Â¿ Deep Learning Insights</div>
             <select id="tickerSelector" style="width: auto; padding: 8px 16px;" onchange="fetchAIPredictions(this.value)">
                 <option value="SPXX">S&P 500 Index (SPXX)</option>
                 <option value="TECH">Technology Basket (TECH)</option>
@@ -366,7 +366,7 @@
 
 <footer>
     <div style="text-align: center;">
-        <p style="font-size: 14px; color: var(--text-secondary);">┬⌐ 2026 Risk-Aware Portfolio Optimisation System.</p>
+        <p style="font-size: 14px; color: var(--text-secondary);">â”¬âŒ 2026 Risk-Aware Portfolio Optimisation System.</p>
     </div>
 </footer>
 
@@ -403,7 +403,7 @@
         // Initial AI prediction fetch
         fetchAIPredictions();
 
-        // ≡ƒÜÇ Fetch real cloud-saved holdings
+        // â‰¡Æ’ÃœÃ‡ Fetch real cloud-saved holdings
         fetchHoldings();
 
         // --- Real-time Pulse: Refresh every 10 seconds for Viva ---
@@ -432,7 +432,7 @@
 
             const baseHoldings = data || [];
             
-            // ≡ƒÜÇ Enrich with Real-Time Prices
+            // â‰¡Æ’ÃœÃ‡ Enrich with Real-Time Prices
             showToast('Fetching live market prices...', 1500);
             
             const enrichPromises = baseHoldings.map(async (asset) => {
@@ -666,7 +666,7 @@
                 returnEl.style.color = ret > 0 ? '#10b981' : '#ef4444';
 
                 document.getElementById('aiRiskScoreValue').textContent = data.ai_risk_score;
-                document.getElementById('aiMessage').textContent = 'Γ£à Analysis Complete: ' + (data.is_simulated ? 'Using baseline predictions.' : 'Real-time LSTM output active.');
+                document.getElementById('aiMessage').textContent = 'Î“Â£Ã  Analysis Complete: ' + (data.is_simulated ? 'Using baseline predictions.' : 'Real-time LSTM output active.');
             } else {
                 throw new Error('API Offline');
             }
@@ -676,7 +676,7 @@
             document.getElementById('predictedCloseValue').textContent = '$142.50';
             document.getElementById('predictedReturnValue').textContent = '+0.45%';
             document.getElementById('aiRiskScoreValue').textContent = '5.2';
-            document.getElementById('aiMessage').innerHTML = '<span style="color:#64748b">≡ƒôí Connect to AI Service (main.py) for live neural insights.</span>';
+            document.getElementById('aiMessage').innerHTML = '<span style="color:#64748b">â‰¡Æ’Ã´Ã­ Connect to AI Service (main.py) for live neural insights.</span>';
         }
     }
 
@@ -689,12 +689,26 @@
         confirmBtn.onclick = onConfirm;
         
         const overlay = document.getElementById('modalOverlay');
+        const overlay = document.getElementById('modalOverlay');
         overlay.classList.add('active');
     }
 
     function closeModal() {
         document.getElementById('modalOverlay').classList.remove('active');
     }
+
+    // Click outside modal to close
+    document.addEventListener('DOMContentLoaded', function() {
+        var overlay = document.getElementById('modalOverlay');
+        if (overlay) {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) closeModal();
+            });
+        }
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+    });
 
     // Real Trade Modal & Savings logic
     function showTradeModal() {
@@ -794,7 +808,7 @@
             if (error) throw error;
 
             closeModal();
-            showToast('Γ£à Live tracking enabled!');
+            showToast('Î“Â£Ã  Live tracking enabled!');
             fetchHoldings(); 
         } catch (error) {
             console.error('Error saving asset:', error);
@@ -813,7 +827,7 @@
                 .eq('id', id);
 
             if (error) throw error;
-            showToast('Γ£à Asset removed.');
+            showToast('Î“Â£Ã  Asset removed.');
             fetchHoldings();
         } catch (error) {
             console.error('Error deleting asset:', error);
@@ -824,7 +838,7 @@
     function simulateExport() {
         showToast('Preparing institutional report...');
         setTimeout(() => {
-            showToast('Γ£à Report generated successfully.');
+            showToast('Î“Â£Ã  Report generated successfully.');
         }, 2000);
     }
 

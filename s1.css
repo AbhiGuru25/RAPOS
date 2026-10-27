@@ -586,41 +586,59 @@ p {
 }
 
 /* ============================================================
-   8. Institutional Ticker
+   8. Institutional Ticker (Infinite Seamless Marquee)
    ============================================================ */
-.ticker-container {
-    background: var(--slate-900);
-    color: white;
-    padding: 10px 0;
-    font-size: 12px;
-    font-weight: 600;
+.ticker-container, .ticker-wrap {
+    width: 100%;
     overflow: hidden;
+    white-space: nowrap;
+    background: #0f172a;
+    padding: 8px 0;
     position: sticky;
     top: 0;
-    z-index: 1000;
+    z-index: 1002;
+    display: block;
+    box-sizing: border-box;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.ticker-wrap {
-    display: flex;
+.ticker-track, .ticker {
+    display: inline-flex;
     white-space: nowrap;
-    overflow: hidden;
+    width: max-content;
+    animation: tickerLoop 40s linear infinite;
+    will-change: transform;
 }
 
-.ticker-wrap .ticker, .ticker-wrap {
-    animation: scroll 30s linear infinite;
+.ticker-track:hover, .ticker:hover {
+    animation-play-state: paused;
 }
 
-@keyframes scroll {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+@keyframes tickerLoop {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-50%, 0, 0); }
 }
 
 .ticker-item {
-    padding: 0 32px;
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    font-size: 12px;
+    padding: 0 28px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #cbd5e1;
+    letter-spacing: 0.3px;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.ticker-up, .trend-up {
+    color: #10b981 !important;
+    font-weight: 700;
+}
+
+.ticker-down, .trend-down {
+    color: #ef4444 !important;
     font-weight: 700;
 }
 
